@@ -1,5 +1,6 @@
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
+import {ListToolsRequestSchema} from '@modelcontextprotocol/sdk/types.js';
 import {z} from 'zod';
 import {assessCenterOfExcellence,createPowerPlatformProjectBrief,designPowerPlatformExpression,generateSolutionBlueprint,getResource,recommendImplementationPattern,reviewPowerPlatformExpression,searchPowerPlatformResources,troubleshootPowerPlatform} from './tools.js';
 import {getOAuthConfig,oauthEnabled,toolBearerChallenge} from './auth.js';
@@ -62,6 +63,24 @@ server.registerTool('assess_power_platform_coe',{description:'Create a native-fi
   organization:z.string().min(1).max(300),maturity:z.enum(['Initial','Repeatable','Defined','Capable','Efficient']),
   makers:z.string().max(700).optional(),environments:z.string().max(700).optional(),governance:z.string().max(1000).optional(),support:z.string().max(700).optional(),goals:z.string().max(1000).optional()
 },annotations:readOnlyAnnotations,_meta:authMeta},protectedHandler(assessCenterOfExcellence));
+
+// The MCP SDK currently serializes OpenAI-compatible security schemes only
+// through `_meta`. ChatGPT also requires the canonical top-level field before
+// it will launch the OAuth linking UI, so mirror the declaration in tools/list.
+const protocol=server.server as any;
+const listToolsHandler=protocol._requestHandlers.get('tools/list');
+if(typeof listToolsHandler!=='function')throw new Error('MCP tools/list handler is unavailable');
+protocol.setRequestHandler(ListToolsRequestSchema,async(request:any,extra:any)=>{
+  const result=await listToolsHandler(request,extra);
+  return {
+    ...result,
+    tools:result.tools.map((tool:any)=>({
+      ...tool,
+      securitySchemes:authMeta.securitySchemes,
+      _meta:{...tool._meta,securitySchemes:authMeta.securitySchemes}
+    }))
+  };
+});
 
 return server;
 }
