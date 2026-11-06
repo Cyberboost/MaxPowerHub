@@ -3,13 +3,21 @@
     "maxpowerhub-ai": {
       "type": "streamable-http",
       "url": "https://maxpowerhub-mcp.vercel.app/mcp",
-      "headers": {},
       "extensions": {
         "com.openai": {
           "auth": {
-            "type": "api_key",
-            "headerScheme": "custom_header",
-            "headerName": "x-vercel-protection-bypass"
+            "type": "oauth",
+            "client": {
+              "mode": "provided",
+              "clientId": "67fbdd50-800a-4bff-9001-081100f8485a",
+              "tokenEndpointAuthMethod": "none"
+            },
+            "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+            "tokenUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+            "baseScopes": [
+              "api://67fbdd50-800a-4bff-9001-081100f8485a/mcp.access",
+              "offline_access"
+            ]
           }
         }
       }

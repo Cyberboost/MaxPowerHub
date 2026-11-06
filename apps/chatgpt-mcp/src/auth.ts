@@ -3,24 +3,30 @@ import {createRemoteJWKSet,jwtVerify} from 'jose';
 const resource='https://maxpowerhub-mcp.vercel.app';
 const metadataUrl=`${resource}/.well-known/oauth-protected-resource`;
 
-export type OAuthConfig={tenantId:string;audience:string;scope:string;issuer:string;jwksUrl:URL};
+export type OAuthConfig={authority:string;audience:string;scope:string;authorizationServer:string;jwksUrl:URL};
 
 export function oauthEnabled(env:NodeJS.ProcessEnv=process.env){return env.OAUTH_ENABLED==='true';}
 
 export function getOAuthConfig(env:NodeJS.ProcessEnv=process.env):OAuthConfig{
-  const tenantId=env.ENTRA_TENANT_ID?.trim();
+  const authority=(env.ENTRA_AUTHORITY?.trim()||env.ENTRA_TENANT_ID?.trim()||'').toLowerCase();
   const audience=env.ENTRA_AUDIENCE?.trim();
   const scope=env.ENTRA_SCOPE?.trim()||'mcp.access';
-  if(!tenantId||!audience)throw new Error('OAuth configuration is incomplete');
-  const issuer=`https://login.microsoftonline.com/${tenantId}/v2.0`;
-  return {tenantId,audience,scope,issuer,jwksUrl:new URL(`https://login.microsoftonline.com/${tenantId}/discovery/v2.0/keys`)};
+  const validAuthority=/^(common|organizations|consumers|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/;
+  if(!validAuthority.test(authority)||!audience)throw new Error('OAuth configuration is incomplete');
+  return {
+    authority,
+    audience,
+    scope,
+    authorizationServer:`https://login.microsoftonline.com/${authority}/v2.0`,
+    jwksUrl:new URL(`https://login.microsoftonline.com/${authority}/discovery/v2.0/keys`)
+  };
 }
 
 export function protectedResourceMetadata(env:NodeJS.ProcessEnv=process.env){
   const config=getOAuthConfig(env);
   return {
     resource,
-    authorization_servers:[config.issuer],
+    authorization_servers:[config.authorizationServer],
     scopes_supported:[config.scope],
     bearer_methods_supported:['header'],
     resource_documentation:'https://maxpowerhub.netlify.app/support/',
@@ -39,7 +45,12 @@ export async function verifyAccessToken(header:string|undefined,env:NodeJS.Proce
   const token=header.slice(7).trim();
   if(!token)throw new Error('Missing bearer token');
   const jwks=createRemoteJWKSet(config.jwksUrl);
-  const {payload}=await jwtVerify(token,jwks,{issuer:config.issuer,audience:config.audience});
+  const {payload}=await jwtVerify(token,jwks,{audience:config.audience});
+  const tenantId=typeof payload.tid==='string'?payload.tid.toLowerCase():'';
+  const expectedIssuer=`https://login.microsoftonline.com/${tenantId}/v2.0`;
+  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(tenantId)||payload.iss!==expectedIssuer){
+    throw new Error('Token issuer is invalid');
+  }
   const scopes=typeof payload.scp==='string'?payload.scp.split(/\s+/).filter(Boolean):[];
   if(!scopes.includes(config.scope))throw new Error('Required scope is missing');
   return payload;
