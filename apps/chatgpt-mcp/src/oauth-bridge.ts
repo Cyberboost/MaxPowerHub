@@ -3,7 +3,7 @@ import {entraAuthorizationServer,getOAuthConfig,oauthResource} from './auth.js';
 
 export const bridgeCallback=`${oauthResource}/oauth/callback`;
 
-type BridgeState={redirectUri:string;clientState:string;expiresAt:number};
+type BridgeState={redirectUri:string;clientId:string;clientState:string;expiresAt:number};
 
 function secret(env:NodeJS.ProcessEnv=process.env){
   const value=env.OAUTH_BRIDGE_SECRET?.trim();
@@ -25,7 +25,7 @@ export function verifyBridgeState(value:string,env:NodeJS.ProcessEnv=process.env
   const expected=signature(payload,env);
   if(sig.length!==expected.length||!timingSafeEqual(Buffer.from(sig),Buffer.from(expected)))throw new Error('Invalid OAuth state');
   const parsed=JSON.parse(Buffer.from(payload,'base64url').toString('utf8')) as BridgeState;
-  if(!isAllowedChatGptRedirect(parsed.redirectUri)||!parsed.clientState||parsed.expiresAt<Date.now())throw new Error('Expired OAuth state');
+  if(!isAllowedOAuthRedirect(parsed.redirectUri,parsed.clientId)||!parsed.clientState||parsed.expiresAt<Date.now())throw new Error('Expired OAuth state');
   return parsed;
 }
 
@@ -44,8 +44,19 @@ export function isAllowedOAuthClient(value:string,env:NodeJS.ProcessEnv=process.
   try{
     const url=new URL(value);
     return url.origin==='https://chatgpt.com' && (
-      url.pathname==='/oauth/client.json' || /^\/oauth\/[A-Za-z0-9_-]+\/client\.json$/.test(url.pathname)
+      /^\/oauth(?:\/[A-Za-z0-9_-]+)*\/client\.json$/.test(url.pathname)
     ) && !url.search && !url.hash;
+  }catch{return false;}
+}
+
+export function isAllowedOAuthRedirect(value:string,clientId:string){
+  if(isAllowedChatGptRedirect(value))return true;
+  const clientMatch=/^https:\/\/chatgpt\.com\/oauth\/codex\/([A-Za-z0-9_-]+)\/client\.json$/.exec(clientId);
+  if(!clientMatch)return false;
+  try{
+    const url=new URL(value);
+    return url.protocol==='http:' && url.hostname==='127.0.0.1' && /^\d+$/.test(url.port) && Number(url.port)>0 &&
+      url.pathname===`/callback/${clientMatch[1]}` && !url.username && !url.password && !url.search && !url.hash;
   }catch{return false;}
 }
 
@@ -67,10 +78,11 @@ export function oauthAuthorizationMetadata(env:NodeJS.ProcessEnv=process.env){
 export function entraAuthorizeUrl(params:URLSearchParams,env:NodeJS.ProcessEnv=process.env){
   const config=getOAuthConfig(env);
   const clientId=config.audience.replace(/^api:\/\//,'');
-  if(!isAllowedOAuthClient(params.get('client_id')||'',env))throw new Error('Unknown OAuth client');
+  const incomingClientId=params.get('client_id')||'';
+  if(!isAllowedOAuthClient(incomingClientId,env))throw new Error('Unknown OAuth client');
   const redirectUri=params.get('redirect_uri')||'';
   const clientState=params.get('state')||'';
-  if(!isAllowedChatGptRedirect(redirectUri)||!clientState)throw new Error('Invalid OAuth redirect');
+  if(!isAllowedOAuthRedirect(redirectUri,incomingClientId)||!clientState)throw new Error('Invalid OAuth redirect');
   if(params.get('response_type')!=='code'||params.get('code_challenge_method')!=='S256'||!params.get('code_challenge'))throw new Error('PKCE S256 is required');
   const upstream=new URL(`${entraAuthorizationServer(env)}/authorize`);
   for(const key of ['response_type','scope','code_challenge','code_challenge_method','prompt','login_hint']){
@@ -78,6 +90,6 @@ export function entraAuthorizeUrl(params:URLSearchParams,env:NodeJS.ProcessEnv=p
   }
   upstream.searchParams.set('client_id',clientId);
   upstream.searchParams.set('redirect_uri',bridgeCallback);
-  upstream.searchParams.set('state',signBridgeState({redirectUri,clientState,expiresAt:Date.now()+10*60_000},env));
+  upstream.searchParams.set('state',signBridgeState({redirectUri,clientId:incomingClientId,clientState,expiresAt:Date.now()+10*60_000},env));
   return upstream;
 }
