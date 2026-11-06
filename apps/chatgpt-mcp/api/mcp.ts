@@ -1,11 +1,12 @@
 import type {VercelRequest,VercelResponse} from '@vercel/node';
 import {StreamableHTTPServerTransport} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {createPowerHubServer} from '../src/server.js';
-import {getOAuthConfig,oauthEnabled,verifyAccessToken} from '../src/auth.js';
+import {getOAuthConfig,oauthEnabled,oauthFailureCategory,verifyAccessToken} from '../src/auth.js';
 
 export default async function handler(req:VercelRequest,res:VercelResponse){
   res.setHeader('Cache-Control','no-store');
   if(req.method!=='POST'){res.setHeader('Allow','POST');return res.status(405).end();}
+  const isToolCall=req.body?.method==='tools/call';
   if(oauthEnabled() && req.headers.authorization?.startsWith('Bearer ')){
     try{
       const payload=await verifyAccessToken(req.headers.authorization);
@@ -13,9 +14,13 @@ export default async function handler(req:VercelRequest,res:VercelResponse){
       const scopes=typeof payload.scp==='string'?payload.scp.split(/\s+/).filter(Boolean):[getOAuthConfig().scope];
       const clientId=typeof payload.azp==='string'?payload.azp:typeof payload.appid==='string'?payload.appid:'maxpowerhub-chatgpt';
       (req as VercelRequest & {auth?:unknown}).auth={token,clientId,scopes,expiresAt:payload.exp,resource:new URL('https://maxpowerhub-mcp.vercel.app'),extra:{subject:payload.sub,tenantId:payload.tid}};
-    }catch{
+      if(isToolCall)console.info(JSON.stringify({event:'mcp_oauth_token_accepted'}));
+    }catch(error){
+      if(isToolCall)console.warn(JSON.stringify({event:'mcp_oauth_token_rejected',category:oauthFailureCategory(error)}));
       // Keep discovery available. Authenticated tool handlers return the MCP OAuth challenge.
     }
+  }else if(oauthEnabled() && isToolCall){
+    console.warn(JSON.stringify({event:'mcp_oauth_missing_bearer'}));
   }
   const origin=req.headers.origin;
   const origins=(process.env.ALLOWED_ORIGINS||'').split(',').map(s=>s.trim()).filter(Boolean);

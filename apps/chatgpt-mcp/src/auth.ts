@@ -50,6 +50,26 @@ export function accessTokenAudiences(audience:string){
   return applicationId===audience?[audience]:[audience,applicationId];
 }
 
+export type OAuthFailureCategory='expired'|'audience'|'issuer'|'scope'|'signature'|'key'|'claim_validation'|'other';
+
+export function oauthFailureCategory(error:unknown):OAuthFailureCategory{
+  const value=error as {code?:unknown;claim?:unknown;message?:unknown};
+  const code=typeof value?.code==='string'?value.code:'';
+  const claim=typeof value?.claim==='string'?value.claim:'';
+  const message=typeof value?.message==='string'?value.message:'';
+  if(code==='ERR_JWT_EXPIRED')return 'expired';
+  if(code==='ERR_JWS_SIGNATURE_VERIFICATION_FAILED')return 'signature';
+  if(code==='ERR_JWKS_NO_MATCHING_KEY')return 'key';
+  if(code==='ERR_JWT_CLAIM_VALIDATION_FAILED'){
+    if(claim==='aud')return 'audience';
+    if(claim==='iss')return 'issuer';
+    return 'claim_validation';
+  }
+  if(message==='Token issuer is invalid')return 'issuer';
+  if(message==='Required scope is missing')return 'scope';
+  return 'other';
+}
+
 export function toolBearerChallenge(scope:string){
   return `Bearer resource_metadata="${metadataUrl}", scope="${scope}", error="insufficient_scope", error_description="Sign in to MaxPowerHub AI to continue"`;
 }

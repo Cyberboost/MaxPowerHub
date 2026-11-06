@@ -4,6 +4,7 @@ import {
   accessTokenAudiences,
   bearerChallenge,
   getOAuthConfig,
+  oauthFailureCategory,
   oauthEnabled,
   protectedResourceMetadata
 } from '../src/auth.js';
@@ -19,6 +20,14 @@ test('OAuth is enabled only by an explicit feature flag',()=>{
   assert.equal(oauthEnabled(env),true);
   assert.equal(oauthEnabled({...env,OAUTH_ENABLED:'false'}),false);
   assert.equal(oauthEnabled({}),false);
+});
+
+test('OAuth diagnostics classify failures without retaining sensitive values',()=>{
+  assert.equal(oauthFailureCategory({code:'ERR_JWT_EXPIRED'}),'expired');
+  assert.equal(oauthFailureCategory({code:'ERR_JWT_CLAIM_VALIDATION_FAILED',claim:'aud'}),'audience');
+  assert.equal(oauthFailureCategory({message:'Token issuer is invalid'}),'issuer');
+  assert.equal(oauthFailureCategory({message:'Required scope is missing'}),'scope');
+  assert.equal(oauthFailureCategory(new Error('a secret-bearing upstream detail')),'other');
 });
 
 test('Entra configuration uses the multi-tenant v2 endpoints',()=>{
