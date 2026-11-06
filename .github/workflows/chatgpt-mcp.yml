@@ -30,4 +30,4 @@ jobs:
           node-version: '22'
       - run: npm install --no-audit --no-fund
       - run: npm test
-      - run: npx tsc --noEmit --module nodenext --moduleResolution nodenext --target es2022 --allowImportingTsExtensions --types node src/server.ts src/http.ts src/tools.ts
+      - run: npx tsc --noEmit --module nodenext --moduleResolution nodenext --target es2022 --allowImportingTsExtensions --types node src/server.ts src/http.ts src/tools.ts api/mcp.ts api/health.ts tests/mcp-protocol.test.ts
