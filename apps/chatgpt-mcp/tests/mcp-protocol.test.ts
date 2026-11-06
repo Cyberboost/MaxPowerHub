@@ -2,6 +2,7 @@ import {test} from 'node:test';
 import {strict as assert} from 'node:assert';
 import {Client} from '@modelcontextprotocol/sdk/client/index.js';
 import {InMemoryTransport} from '@modelcontextprotocol/sdk/inMemory.js';
+import {z} from 'zod';
 import {createPowerHubServer} from '../src/server.ts';
 
 test('MCP initializes, discovers nine tools, and invokes search', async () => {
@@ -27,6 +28,8 @@ test('MCP initializes, discovers nine tools, and invokes search', async () => {
     assert.ok(listed.tools.every(tool=>tool.annotations?.destructiveHint===false));
     assert.ok(listed.tools.every(tool=>tool.annotations?.openWorldHint===false));
     assert.ok(listed.tools.every(tool=>Array.isArray(tool._meta?.securitySchemes)));
+    const raw=await client.request({method:'tools/list',params:{}},z.any());
+    assert.ok(raw.tools.every((tool:any)=>Array.isArray(tool.securitySchemes)));
     const result=await client.callTool({name:'search_power_platform_resources',arguments:{query:'Power Fx',limit:3}});
     assert.equal(result.isError,undefined);
     assert.ok(Array.isArray(result.content));
@@ -55,9 +58,12 @@ test('OAuth mode permits discovery and challenges unauthenticated tool calls', a
     await Promise.all([server.connect(serverTransport),client.connect(clientTransport)]);
     const listed=await client.listTools();
     assert.equal(listed.tools.length,9);
-    assert.ok(listed.tools.every(tool=>{
-      const schemes=tool._meta?.securitySchemes as Array<{scopes?:string[]}>|undefined;
-      return schemes?.[0]?.scopes?.includes('api://67fbdd50-800a-4bff-9001-081100f8485a/mcp.access');
+    const raw=await client.request({method:'tools/list',params:{}},z.any());
+    assert.ok(raw.tools.every((tool:any)=>{
+      const canonical=tool.securitySchemes as Array<{scopes?:string[]}>|undefined;
+      const compatibility=tool._meta?.securitySchemes as Array<{scopes?:string[]}>|undefined;
+      return canonical?.[0]?.scopes?.includes('api://67fbdd50-800a-4bff-9001-081100f8485a/mcp.access')
+        && compatibility?.[0]?.scopes?.includes('api://67fbdd50-800a-4bff-9001-081100f8485a/mcp.access');
     }));
     const result=await client.callTool({name:'search_power_platform_resources',arguments:{query:'Power Fx'}});
     assert.equal(result.isError,true);
