@@ -6,7 +6,7 @@
       "extensions": {
         "com.openai": {
           "auth": {
-            "type": "mixed",
+            "type": "oauth",
             "client": {
               "mode": "provided",
               "clientId": "67fbdd50-800a-4bff-9001-081100f8485a",
@@ -14,6 +14,7 @@
             },
             "authorizationUrl": "https://login.microsoftonline.com/9e1e0ee5-54f2-4e97-99b9-72bbe6eda2ea/oauth2/v2.0/authorize",
             "tokenUrl": "https://login.microsoftonline.com/9e1e0ee5-54f2-4e97-99b9-72bbe6eda2ea/oauth2/v2.0/token",
+            "resource": "https://maxpowerhub-mcp.vercel.app",
             "baseScopes": [
               "api://67fbdd50-800a-4bff-9001-081100f8485a/mcp.access",
               "offline_access"
