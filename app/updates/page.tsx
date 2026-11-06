@@ -1,0 +1,45 @@
+import {ArrowLeft, ArrowRight, Bot, CalendarDays, Check, CheckCircle2, Clock3, ExternalLink, FlaskConical, ShieldCheck, Sparkles} from 'lucide-react';
+
+export const metadata={
+  title:'MaxPowerHub AI Updates | Releases and roadmap',
+  description:'See what is live, what has shipped, and what is planned next for MaxPowerHub AI by CyberBoost.',
+};
+
+const currentCapabilities=[
+  'Search and retrieve curated Power Platform resources',
+  'Recommend implementation patterns with sources',
+  'Generate enterprise solution blueprints and release gates',
+  'Design and review Power Fx and Power Automate expressions',
+  'Create project briefs, test plans, risk registers, and governance gates',
+  'Build native-first Center of Excellence readiness and 90-day plans',
+  'Troubleshoot with evidence collection and escalation guidance',
+];
+
+const releases=[
+  {version:'0.4.1',date:'November 6, 2026',title:'Discovery & Onboarding Polish',summary:'Updated the plugin presentation so users and ChatGPT can immediately understand the enterprise architecture, governance, formula engineering, project-planning, and troubleshooting capabilities.',items:['Source-aware architect positioning','Improved default operating prompt and safety boundaries','Power Platform discovery keywords added']},
+  {version:'0.4.0',date:'November 6, 2026',title:'Formula & Expression Engineer',summary:'Added documented Power Fx and Power Automate draft patterns, deeper static reviews, delegation checks, null safety, error-handling guidance, and secret-exposure warnings.',items:['Nine MCP tools available','Twelve automated tests passing','Live Power Fx and Power Automate validation completed']},
+  {version:'0.3.0',date:'November 6, 2026',title:'Enterprise Solution Architect',summary:'Expanded solution blueprints into practical delivery packages aligned to Microsoft Power Platform Well-Architected guidance.',items:['Five-pillar architecture review','Environment and managed-solution strategy','RACI, testing, release, recovery, acceptance, and risk planning']},
+  {version:'0.2.0',date:'November 6, 2026',title:'Guided Architecture & CoE Foundation',summary:'Introduced project briefs, richer troubleshooting, solution blueprints, and native-first Center of Excellence planning.',items:['Eight MCP tools available','Native admin-center and Managed Environments approach','Starter Kit no longer treated as the default CoE foundation']},
+  {version:'0.1.1',date:'November 6, 2026',title:'Secure Production Connection',summary:'Moved the private plugin from a deployment-specific preview address to the stable MaxPowerHub production MCP endpoint.',items:['Canonical production URL','Secure protection-bypass header preserved','Initial four tools verified in ChatGPT-compatible MCP discovery']},
+];
+
+const roadmap=[
+  {version:'0.5',status:'Planned',icon:Clock3,title:'Live documentation verification',description:'Controlled checks against current Microsoft guidance, freshness indicators, source dates, and transparent distinctions between retrieved facts and inferred recommendations.',items:['Current-source verification','Freshness and confidence indicators','Citation-quality controls']},
+  {version:'0.6',status:'Planned',icon:Clock3,title:'Project workspace & professional deliverables',description:'Carry project context across a working session and produce polished architecture, governance, testing, troubleshooting, and executive-ready documents.',items:['Structured project workspace','Reusable decision and risk registers','Export-ready delivery artifacts']},
+  {version:'0.7',status:'Research',icon:FlaskConical,title:'Read-only tenant-aware diagnostics',description:'Explore explicitly authorized, least-privilege access to selected Power Platform metadata and diagnostics. No automatic production changes.',items:['Read-only pilot first','Explicit consent and scoped permissions','Security review before any tenant connection']},
+];
+
+export default function UpdatesPage(){return <main className="updates-shell">
+  <header className="site-header updates-header"><a className="brand" href="/" aria-label="MaxPowerHub home"><span className="brand-mark"><Sparkles size={19}/></span><span>MaxPower<b>Hub</b><small>by CyberBoost</small></span></a><nav aria-label="Updates navigation"><a href="/"><ArrowLeft size={14}/> Home</a><a href="#current">Current</a><a href="#history">History</a><a href="#roadmap">Roadmap</a><a className="nav-cta" href="https://chatgpt.com/plugins/plugins_6aed8dd43d7c8191a8795e60178e16ba" target="_blank" rel="noreferrer">Open in ChatGPT <ExternalLink size={14}/></a></nav></header>
+
+  <section className="updates-hero"><div><div className="kicker"><span></span>Product updates</div><h1>Built in public.<br/><em>Improved with purpose.</em></h1><p>Follow MaxPowerHub AI from secure foundation to enterprise-grade Power Platform copilot. Every shipped capability is tested, every future capability is labeled, and every release keeps human review at the center.</p><div className="updates-hero-actions"><a className="button primary" href="#current">See what is live <ArrowRight size={16}/></a><a className="button quiet" href="#roadmap">View the roadmap</a></div></div><div className="release-snapshot"><div className="snapshot-top"><span>Current release</span><b>Live</b></div><strong>0.4.1</strong><h2>Power Platform Architect & Engineering Copilot</h2><p>Enterprise architecture, native-first CoE planning, project delivery, troubleshooting, and safer Power Fx and Power Automate engineering in ChatGPT.</p><div><span><CheckCircle2 size={15}/> Production ready</span><span><ShieldCheck size={15}/> Private access</span><span><Bot size={15}/> 9 tools</span></div></div></section>
+
+  <section id="current" className="updates-section current-release"><div className="updates-heading"><div><div className="kicker"><span></span>Available today</div><h2>What MaxPowerHub AI can do now.</h2></div><span className="status-pill live">Live · 0.4.1</span></div><div className="capability-list">{currentCapabilities.map(item=><div key={item}><Check size={16}/><span>{item}</span></div>)}</div><div className="current-cta"><p>MaxPowerHub AI provides planning and engineering guidance. It does not inspect or change a Microsoft tenant unless a future, explicitly authorized connection is introduced.</p><a className="button primary" href="https://chatgpt.com/plugins/plugins_6aed8dd43d7c8191a8795e60178e16ba" target="_blank" rel="noreferrer">Use MaxPowerHub AI <ExternalLink size={15}/></a></div></section>
+
+  <section id="history" className="updates-section release-history"><div className="updates-heading"><div><div className="kicker"><span></span>Release history</div><h2>Every step forward.</h2><p>Major capabilities shipped to the existing private plugin and verified against the production MCP endpoint.</p></div></div><div className="release-timeline">{releases.map((release,index)=><article key={release.version}><div className="timeline-marker"><span>{index===0?<Sparkles size={15}/>:<Check size={15}/>}</span><i></i></div><div className="release-card"><div className="release-meta"><span className="status-pill shipped">Shipped</span><span><CalendarDays size={13}/>{release.date}</span></div><small>Version {release.version}</small><h3>{release.title}</h3><p>{release.summary}</p><ul>{release.items.map(item=><li key={item}><Check size={13}/>{item}</li>)}</ul></div></article>)}</div></section>
+
+  <section id="roadmap" className="updates-section roadmap-section"><div className="updates-heading"><div><div className="kicker"><span></span>Looking ahead</div><h2>The road to a stronger Power Platform copilot.</h2><p>Roadmap items describe direction, not guaranteed dates. Scope may change as Microsoft products, security requirements, and user needs evolve.</p></div></div><div className="roadmap-grid">{roadmap.map(item=><article key={item.version}><div className="roadmap-top"><span className={`status-pill ${item.status.toLowerCase()}`}>{item.status}</span><item.icon size={20}/></div><small>Target {item.version}</small><h3>{item.title}</h3><p>{item.description}</p><ul>{item.items.map(detail=><li key={detail}>{detail}</li>)}</ul></article>)}</div></section>
+
+  <section className="updates-close"><div><div className="kicker"><span></span>Help shape what comes next</div><h2>Built for real Power Platform work.</h2><p>Use MaxPowerHub AI, challenge its recommendations, and bring the difficult architecture, governance, formula, and troubleshooting questions.</p></div><a className="button primary" href="https://www.mycyberboost.tech" target="_blank" rel="noreferrer">Talk with CyberBoost <ArrowRight size={16}/></a></section>
+  <footer className="info-footer"><span>MaxPowerHub AI by CyberBoost</span><p>Release status reflects verified capabilities. Planned and research items are not commitments or claims of current availability.</p><div className="footer-links"><a href="/">Home</a><a href="/about/">About</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></div></footer>
+</main>}
