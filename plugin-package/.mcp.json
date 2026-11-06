@@ -6,7 +6,7 @@
       "extensions": {
         "com.openai": {
           "auth": {
-            "type": "oauth",
+            "type": "mixed",
             "client": {
               "mode": "provided",
               "clientId": "67fbdd50-800a-4bff-9001-081100f8485a",

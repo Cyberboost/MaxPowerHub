@@ -26,6 +26,7 @@ test('MCP initializes, discovers nine tools, and invokes search', async () => {
     assert.ok(listed.tools.every(tool=>tool.annotations?.readOnlyHint===true));
     assert.ok(listed.tools.every(tool=>tool.annotations?.destructiveHint===false));
     assert.ok(listed.tools.every(tool=>tool.annotations?.openWorldHint===false));
+    assert.ok(listed.tools.every(tool=>Array.isArray(tool._meta?.securitySchemes)));
     const result=await client.callTool({name:'search_power_platform_resources',arguments:{query:'Power Fx',limit:3}});
     assert.equal(result.isError,undefined);
     assert.ok(Array.isArray(result.content));
@@ -38,5 +39,31 @@ test('MCP initializes, discovers nine tools, and invokes search', async () => {
   } finally {
     await client.close();
     await server.close();
+  }
+});
+
+test('OAuth mode permits discovery and challenges unauthenticated tool calls', async () => {
+  const previous={enabled:process.env.OAUTH_ENABLED,authority:process.env.ENTRA_AUTHORITY,audience:process.env.ENTRA_AUDIENCE,scope:process.env.ENTRA_SCOPE};
+  process.env.OAUTH_ENABLED='true';
+  process.env.ENTRA_AUTHORITY='common';
+  process.env.ENTRA_AUDIENCE='api://67fbdd50-800a-4bff-9001-081100f8485a';
+  process.env.ENTRA_SCOPE='mcp.access';
+  const server=createPowerHubServer();
+  const client=new Client({name:'maxpowerhub-auth-test-client',version:'0.1.0'});
+  const [clientTransport,serverTransport]=InMemoryTransport.createLinkedPair();
+  try {
+    await Promise.all([server.connect(serverTransport),client.connect(clientTransport)]);
+    const listed=await client.listTools();
+    assert.equal(listed.tools.length,9);
+    const result=await client.callTool({name:'search_power_platform_resources',arguments:{query:'Power Fx'}});
+    assert.equal(result.isError,true);
+    assert.ok(Array.isArray(result._meta?.['mcp/www_authenticate']));
+  } finally {
+    await client.close();
+    await server.close();
+    for(const [key,value] of Object.entries(previous)){
+      const envKey={enabled:'OAUTH_ENABLED',authority:'ENTRA_AUTHORITY',audience:'ENTRA_AUDIENCE',scope:'ENTRA_SCOPE'}[key] as string;
+      if(value===undefined)delete process.env[envKey]; else process.env[envKey]=value;
+    }
   }
 });

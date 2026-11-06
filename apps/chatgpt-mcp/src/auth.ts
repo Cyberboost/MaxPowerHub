@@ -39,6 +39,10 @@ export function bearerChallenge(scope:string){
   return `Bearer resource_metadata="${metadataUrl}", scope="${scope}"`;
 }
 
+export function toolBearerChallenge(scope:string){
+  return `Bearer resource_metadata="${metadataUrl}", scope="${scope}", error="insufficient_scope", error_description="Sign in to MaxPowerHub AI to continue"`;
+}
+
 export async function verifyAccessToken(header:string|undefined,env:NodeJS.ProcessEnv=process.env){
   const config=getOAuthConfig(env);
   if(!header?.startsWith('Bearer '))throw new Error('Missing bearer token');
