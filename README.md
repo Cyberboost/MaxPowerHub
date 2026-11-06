@@ -1,4 +1,4 @@
-# PowerHub AI by CyberBoost
+# MaxPowerHub by CyberBoost
 
 Initial standalone public-beta application for a Microsoft Power Platform resource library and citation-first assistant.
 
@@ -28,7 +28,7 @@ npm audit
 
 ## Public-launch gates
 
-- Complete a naming, domain, and trademark review. “PowerHub” is already used by multiple active software and AI businesses.
+- Complete formal domain and trademark clearance. A preliminary exact-name search found no obvious software product conflict, but did identify an Australian marketplace seller using the `maxpowerhub` handle.
 - Replace the in-memory limiter with a persistent, distributed limiter before enabling public AI requests.
 - Configure provider spending caps, monitoring, abuse protection, and incident handling.
 - Verify every curated URL and establish a review cadence for product changes and stale links.

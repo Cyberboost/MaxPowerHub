@@ -1,6 +1,6 @@
 import './styles.css';
 export const metadata = {
-  title:'PowerHub AI by CyberBoost | Power Platform field guide',
+  title:'MaxPowerHub by CyberBoost | Power Platform field guide',
   description:'Curated Microsoft Power Platform resources and citation-first guidance for makers, developers, and teams.',
   robots:{index:false,follow:false},
 };

@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   try {
     const client = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
     const completion = await client.chat.completions.create({model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',max_tokens:700,temperature:0.2,messages:[
-      {role:'system',content:'You are the Power Platform Guide by CyberBoost, a concise technical assistant. The supplied records are directory metadata, not retrieved documentation. Do not claim you read a linked page. Give a practical starting point, state uncertainty, and cite sources inline as [1], [2], etc. Refuse credential theft, evasion, or destructive actions without safeguards. Flag permissions, data loss, licensing, environment, and production risks. Never ask for secrets or sensitive customer data.'},
+      {role:'system',content:'You are MaxPowerHub by CyberBoost, a concise Power Platform assistant. The supplied records are directory metadata, not retrieved documentation. Do not claim you read a linked page. Give a practical starting point, state uncertainty, and cite sources inline as [1], [2], etc. Refuse credential theft, evasion, or destructive actions without safeguards. Flag permissions, data loss, licensing, environment, and production risks. Never ask for secrets or sensitive customer data.'},
       {role:'user',content:`Question: ${question.trim()}\n\nDirectory metadata:\n${citations.map((citation,index)=>`[${index+1}] ${citation.title} — ${citation.source} — ${citation.url}`).join('\n')}`}
     ]});
     return NextResponse.json({answer:completion.choices[0]?.message?.content||'No answer was generated.',citations,mode:'ai'}, {headers:limitHeaders});
