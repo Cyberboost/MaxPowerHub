@@ -5,7 +5,7 @@ import {assessCenterOfExcellence,createPowerPlatformProjectBrief,designPowerPlat
 import {getOAuthConfig,oauthEnabled,toolBearerChallenge} from './auth.js';
 
 export function createPowerHubServer(){
-const server=new McpServer({name:'maxpowerhub-by-cyberboost',version:'0.4.4'});
+const server=new McpServer({name:'maxpowerhub-by-cyberboost',version:'0.4.6'});
 const respond=(data:unknown)=>({content:[{type:'text' as const,text:JSON.stringify(data)}]});
 const readOnlyAnnotations={readOnlyHint:true,destructiveHint:false,openWorldHint:false} as const;
 const scope=()=>{try{return getOAuthConfig().scope;}catch{return 'mcp.access';}};
