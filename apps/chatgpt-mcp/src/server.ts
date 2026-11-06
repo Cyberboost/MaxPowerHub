@@ -1,7 +1,7 @@
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 import {z} from 'zod';
-import {createPowerPlatformProjectBrief,generateSolutionBlueprint,getResource,recommendImplementationPattern,reviewPowerPlatformExpression,searchPowerPlatformResources,troubleshootPowerPlatform} from './tools.js';
+import {assessCenterOfExcellence,createPowerPlatformProjectBrief,generateSolutionBlueprint,getResource,recommendImplementationPattern,reviewPowerPlatformExpression,searchPowerPlatformResources,troubleshootPowerPlatform} from './tools.js';
 
 export function createPowerHubServer(){
 const server=new McpServer({name:'maxpowerhub-by-cyberboost',version:'0.2.0'});
@@ -38,6 +38,11 @@ server.tool('create_power_platform_project_brief','Turn discovery notes into a s
   name:z.string().min(1).max(160),objective:z.string().min(1).max(1000),users:z.string().min(1).max(700),scope:z.string().min(1).max(1200),
   data:z.string().max(700).optional(),integrations:z.string().max(700).optional(),success:z.string().max(700).optional(),constraints:z.string().max(700).optional()
 },async input=>respond(createPowerPlatformProjectBrief(input)));
+
+server.tool('assess_power_platform_coe','Create a native-first Power Platform Center of Excellence readiness, governance, operating-model, and 90-day management plan',{
+  organization:z.string().min(1).max(300),maturity:z.enum(['Initial','Repeatable','Defined','Capable','Efficient']),
+  makers:z.string().max(700).optional(),environments:z.string().max(700).optional(),governance:z.string().max(1000).optional(),support:z.string().max(700).optional(),goals:z.string().max(1000).optional()
+},async input=>respond(assessCenterOfExcellence(input)));
 
 return server;
 }

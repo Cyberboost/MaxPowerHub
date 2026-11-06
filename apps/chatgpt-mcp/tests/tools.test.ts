@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import {strict as assert} from 'node:assert';
-import {createPowerPlatformProjectBrief,generateSolutionBlueprint,getResource,recommendImplementationPattern,reviewPowerPlatformExpression,searchPowerPlatformResources,troubleshootPowerPlatform} from '../src/tools.ts';
+import {assessCenterOfExcellence,createPowerPlatformProjectBrief,generateSolutionBlueprint,getResource,recommendImplementationPattern,reviewPowerPlatformExpression,searchPowerPlatformResources,troubleshootPowerPlatform} from '../src/tools.ts';
 
 test('search returns canonical source links',()=>{
  const result=searchPowerPlatformResources({query:'power fx',limit:3});
@@ -38,4 +38,13 @@ test('project brief identifies missing discovery inputs',()=>{
  assert.equal(result.status,'draft-project-brief');
  assert.ok(result.discoveryQuestions.some(q=>/success measures/i.test(q)));
  assert.ok(result.governanceGates.length>=4);
+});
+test('CoE assessment is native-first and does not present the Starter Kit as the default',()=>{
+ const result=assessCenterOfExcellence({organization:'Contoso',maturity:'Repeatable',goals:'Scale governed maker adoption'});
+ assert.equal(result.status,'coe-readiness-plan');
+ assert.equal(result.first90Days.length,3);
+ assert.ok(result.nativeFirstControls.length>=3);
+ assert.match(result.starterKitPosition,/no longer actively maintained/i);
+ assert.match(result.note,/No tenant settings were inspected or changed/i);
+ assert.ok(result.sources.every(source=>source.url.startsWith('https://learn.microsoft.com/')));
 });

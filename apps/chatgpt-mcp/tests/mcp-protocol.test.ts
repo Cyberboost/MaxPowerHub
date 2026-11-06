@@ -4,7 +4,7 @@ import {Client} from '@modelcontextprotocol/sdk/client/index.js';
 import {InMemoryTransport} from '@modelcontextprotocol/sdk/inMemory.js';
 import {createPowerHubServer} from '../src/server.ts';
 
-test('MCP initializes, discovers seven tools, and invokes search', async () => {
+test('MCP initializes, discovers eight tools, and invokes search', async () => {
   const server=createPowerHubServer();
   const client=new Client({name:'maxpowerhub-test-client',version:'0.1.0'});
   const [clientTransport,serverTransport]=InMemoryTransport.createLinkedPair();
@@ -13,6 +13,7 @@ test('MCP initializes, discovers seven tools, and invokes search', async () => {
     const listed=await client.listTools();
     const names=listed.tools.map(t=>t.name).sort();
     assert.deepEqual(names,[
+      'assess_power_platform_coe',
       'create_power_platform_project_brief',
       'generate_solution_blueprint',
       'get_resource',

@@ -110,3 +110,49 @@ export function createPowerPlatformProjectBrief(input:{name:string;objective:str
     note:'Planning draft. Owners, dates, estimates, and approvals must be assigned by the delivery team.'
   };
 }
+
+const coeSources=[
+  {id:'ms-coe-establish',title:'Establish a Microsoft Power Platform Center of Excellence',url:'https://learn.microsoft.com/power-platform/guidance/adoption/coe',source:'Microsoft Learn'},
+  {id:'ms-coe-governance',title:'Establish a Center of Excellence with governance patterns and practices',url:'https://learn.microsoft.com/power-platform/guidance/adoption/common-vision/establish-coe',source:'Microsoft Learn'},
+  {id:'ms-adoption-maturity',title:'Power Platform adoption maturity model',url:'https://learn.microsoft.com/power-platform/guidance/adoption/maturity-model',source:'Microsoft Learn'},
+  {id:'ms-managed-environments',title:'Enable Managed Environments',url:'https://learn.microsoft.com/power-platform/admin/managed-environment-enable',source:'Microsoft Learn'},
+  {id:'ms-environments',title:'Power Platform environments overview',url:'https://learn.microsoft.com/power-platform/admin/environments-overview',source:'Microsoft Learn'},
+  {id:'ms-guidance-whats-new',title:"What's new in Microsoft Power Platform guidance",url:'https://learn.microsoft.com/power-platform/guidance/adoption/whats-new',source:'Microsoft Learn'}
+];
+
+export function assessCenterOfExcellence(input:{
+  organization:string;maturity:'Initial'|'Repeatable'|'Defined'|'Capable'|'Efficient';
+  makers?:string;environments?:string;governance?:string;support?:string;goals?:string;
+}) {
+  const prioritiesByMaturity={
+    Initial:['Name an executive sponsor and accountable Power Platform product owner.','Inventory environments, apps, flows, makers, connectors, and business-critical solutions.','Apply baseline data policies and define the purpose of the default environment.'],
+    Repeatable:['Publish a common vision, measurable goals, and a demand-intake process.','Define environment, data policy, request, license, and capacity strategies.','Create maker onboarding, training, and a community of practice.'],
+    Defined:['Operationalize KPIs, business-value measurement, tiered environments, and support models.','Use solutions, pipelines, environment variables, and connection references for ALM.','Review overshared, unused, orphaned, and business-critical resources on a schedule.'],
+    Capable:['Automate governance actions through risk-based approvals and accountable owners.','Scale adoption through environment groups, reusable patterns, champions, and dedicated operations.','Use telemetry to prioritize remediation, support, investment, and modernization.'],
+    Efficient:['Continuously optimize policy, support, automation, value measurement, and responsible AI governance.','Use risk profiles for automated routing while preserving human approval for consequential actions.','Benchmark outcomes across business units and share proven practices.']
+  } as const;
+  return {
+    status:'coe-readiness-plan',
+    organization:input.organization,
+    currentMaturity:input.maturity,
+    targetOperatingModel:{
+      leadership:['Executive sponsor','Power Platform product owner','Business and technology steering group'],
+      platformOperations:['Power Platform administrators','Security, compliance, identity, licensing, and service-management partners'],
+      enablement:['CoE or Center of Enablement lead','Solution architects','Maker-success and champions community'],
+      delivery:['Business owners','Professional and citizen developers','Test, release, support, and data owners']
+    },
+    priorities:[...prioritiesByMaturity[input.maturity]],
+    governanceCadence:{weekly:['Review service health, failed critical automations, urgent security recommendations, and production incidents'],monthly:['Review inventory, sharing, orphaned assets, capacity, licenses, connector usage, exceptions, and support trends'],quarterly:['Review maturity, KPIs, business value, environment strategy, DLP policy, critical-solution portfolio, and roadmap']},
+    nativeFirstControls:['Power Platform admin center analytics and recommended actions','Managed Environments and environment groups where licensing and requirements support them','Data policies, environment routing and strategy, tenant settings, security roles, and pipelines','Native inventory, usage, capacity, licensing, monitoring, and support processes'],
+    starterKitPosition:'Microsoft guidance published in May 2026 states that the CoE Starter Kit is no longer actively maintained and that many capabilities are now native in the Power Platform admin center. Assess existing Starter Kit dependencies and transition deliberately; do not start a new CoE by assuming the kit is the default.',
+    first90Days:[
+      {phase:'Days 1–30',outcomes:['Confirm sponsor, ownership, scope, success measures, and decision rights.','Establish a tenant baseline and identify critical, overshared, unused, and orphaned assets.','Document immediate risks and baseline policies without disrupting business-critical solutions.']},
+      {phase:'Days 31–60',outcomes:['Publish environment, DLP, maker, ALM, support, and exception-management standards.','Launch maker onboarding, champions, demand intake, and a risk-tiered support model.','Pilot native governance controls in a controlled environment group.']},
+      {phase:'Days 61–90',outcomes:['Operationalize dashboards, review cadences, ownership communications, and remediation workflows.','Measure adoption, risk reduction, delivery speed, support demand, and business value.','Approve the next maturity roadmap based on evidence and stakeholder feedback.']}
+    ],
+    requiredInputs:['Tenant and environment inventory','Roles and decision rights','Data classification and regulatory obligations','Current DLP, connector, sharing, and environment policies','Licensing, capacity, support, ALM, and critical-solution portfolio','Maker population, training needs, adoption goals, and business-value measures'],
+    providedContext:{makers:input.makers||'Not provided',environments:input.environments||'Not provided',governance:input.governance||'Not provided',support:input.support||'Not provided',goals:input.goals||'Not provided'},
+    sources:coeSources,
+    note:'Read-only planning guidance. No tenant settings were inspected or changed. Validate licensing and current Microsoft guidance before implementation.'
+  };
+}
