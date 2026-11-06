@@ -18,9 +18,14 @@ export function getOAuthConfig(env:NodeJS.ProcessEnv=process.env):OAuthConfig{
     audience,
     scope,
     authorizationScope:env.ENTRA_AUTHORIZATION_SCOPE?.trim()||`${audience.startsWith('api://')?audience:`api://${audience}`}/${scope}`,
-    authorizationServer:`https://login.microsoftonline.com/${authority}/v2.0`,
+    authorizationServer:resource,
     jwksUrl:new URL(`https://login.microsoftonline.com/${authority}/discovery/v2.0/keys`)
   };
+}
+
+export function entraAuthorizationServer(env:NodeJS.ProcessEnv=process.env){
+  const {authority}=getOAuthConfig(env);
+  return `https://login.microsoftonline.com/${authority}/oauth2/v2.0`;
 }
 
 export function protectedResourceMetadata(env:NodeJS.ProcessEnv=process.env){
