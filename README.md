@@ -7,10 +7,13 @@ Live library-only preview: [maxpowerhub.netlify.app](https://maxpowerhub.netlify
 ## What is included
 
 - Responsive, accessible product homepage
-- Searchable and filterable directory of curated Microsoft and community sources
+- Intent-aware weighted search with product, role, task, and skill-level filters
+- Shareable search URLs and transparent match explanations
+- Developer, Architect, Maker, and Administrator pathways
+- Four-question implementation-pattern guide with cited supporting resources
 - Library-only assistant experience with structured source cards
 - Static export with no server credentials or AI usage costs
-- Input length controls and an illustrative in-memory hourly limit
+- Input length controls with no prompt transmission or storage
 - CyberBoost attribution and consulting call to action
 
 ## Run locally

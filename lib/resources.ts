@@ -39,6 +39,87 @@ export const resources: Resource[] = [
 export const libraryReviewedOn = 'November 5, 2026';
 export const products = ['All', ...Array.from(new Set(resources.map((resource) => resource.product)))];
 
+export const roles = ['All roles', 'Maker', 'Developer', 'Architect', 'Administrator'] as const;
+export const tasks = ['All tasks', 'Learn', 'Build', 'Integrate', 'Secure', 'Deploy', 'Govern', 'Troubleshoot'] as const;
+export const levels = ['All levels', 'Start here', 'Intermediate', 'Advanced'] as const;
+
+const searchAliases: Record<string, string[]> = {
+  prod: ['production', 'deployment', 'alm'], production: ['deployment', 'alm', 'environment', 'managed solution'],
+  move: ['migration', 'deployment', 'alm'], ship: ['deployment', 'alm'], release: ['deployment', 'alm'],
+  secure: ['security', 'permissions', 'roles', 'dlp'], auth: ['authentication', 'security'],
+  slow: ['performance', 'delegation', 'optimization'], formula: ['power fx', 'formulas', 'expressions'],
+  code: ['developer', 'sdk', 'api', 'pcf', 'plugin'], component: ['pcf', 'components'],
+  api: ['web api', 'sdk', 'integration'], integrate: ['connectors', 'api', 'webhooks'],
+  automate: ['automation', 'flows', 'power automate'], bot: ['agent', 'copilot'],
+  error: ['troubleshooting', 'diagnostics'], broken: ['troubleshooting', 'diagnostics'],
+  govern: ['governance', 'coe', 'dlp', 'administration'], architect: ['architecture', 'well-architected'],
+};
+
+function resourceTasks(resource: Resource) {
+  const text = `${resource.title} ${resource.description} ${resource.type} ${resource.tags.join(' ')}`.toLowerCase();
+  const matches: string[] = [];
+  if (/overview|documentation|learning|reference|start/.test(text)) matches.push('Learn');
+  if (/build|formula|component|sample|canvas|model-driven/.test(text)) matches.push('Build');
+  if (/connector|api|webhook|integration|data transformation/.test(text)) matches.push('Integrate');
+  if (/security|permission|role|authentication|dlp/.test(text)) matches.push('Secure');
+  if (/alm|deploy|production|pipeline|environment|solution/.test(text)) matches.push('Deploy');
+  if (/governance|admin|coe|adoption|tenant|architecture/.test(text)) matches.push('Govern');
+  if (/troubleshoot|diagnostic|error|support/.test(text)) matches.push('Troubleshoot');
+  return matches;
+}
+
+function resourceRoles(resource: Resource) {
+  const text = `${resource.product} ${resource.title} ${resource.description} ${resource.type} ${resource.tags.join(' ')}`.toLowerCase();
+  const matches = new Set<string>();
+  if (/start here|power apps|power automate|formula|approval|canvas/.test(`${resource.level.toLowerCase()} ${text}`)) matches.add('Maker');
+  if (/developer|api|sdk|plugin|pcf|cli|code|expression|sample|connector/.test(text)) matches.add('Developer');
+  if (/architecture|security|alm|environment|governance|well-architected|integration|dataverse/.test(text)) matches.add('Architect');
+  if (/admin|governance|tenant|environment|capacity|dlp|coe/.test(text)) matches.add('Administrator');
+  if (!matches.size) matches.add('Maker');
+  return [...matches];
+}
+
+export type SearchFilters = {product:string; role:string; task:string; level:string};
+export type RankedResource = Resource & {score:number; reasons:string[]; tasks:string[]; roles:string[]};
+
+export function searchResources(query: string, filters: SearchFilters): RankedResource[] {
+  const normalized = query.toLowerCase().trim();
+  const rawTerms = normalized.split(/[^a-z0-9+#.-]+/).filter(Boolean);
+  const terms = Array.from(new Set(rawTerms.flatMap(term => [term, ...(searchAliases[term] || [])])));
+  return resources.map(resource => {
+    const title = resource.title.toLowerCase();
+    const product = resource.product.toLowerCase();
+    const tags = resource.tags.join(' ').toLowerCase();
+    const description = resource.description.toLowerCase();
+    const type = resource.type.toLowerCase();
+    const matchedTasks = resourceTasks(resource);
+    const matchedRoles = resourceRoles(resource);
+    let score = normalized && title.includes(normalized) ? 20 : 0;
+    const reasons = new Set<string>();
+    for (const term of terms) {
+      if (title.includes(term)) { score += 8; reasons.add('title'); }
+      if (product.includes(term)) { score += 6; reasons.add('product'); }
+      if (tags.includes(term)) { score += 5; reasons.add('topic'); }
+      if (type.includes(term)) { score += 3; reasons.add('resource type'); }
+      if (description.includes(term)) { score += 2; reasons.add('description'); }
+    }
+    if (filters.product !== 'All' && resource.product !== filters.product) return null;
+    if (filters.role !== 'All roles' && !matchedRoles.includes(filters.role)) return null;
+    if (filters.task !== 'All tasks' && !matchedTasks.includes(filters.task)) return null;
+    if (filters.level !== 'All levels' && resource.level !== filters.level) return null;
+    if (normalized && score === 0) return null;
+    return {...resource, score, reasons:[...reasons], tasks:matchedTasks, roles:matchedRoles};
+  }).filter((item): item is RankedResource => Boolean(item))
+    .sort((a,b) => b.score-a.score || resources.findIndex(item=>item.id===a.id)-resources.findIndex(item=>item.id===b.id));
+}
+
+export const rolePathways = [
+  {role:'Developer',title:'Build, extend, and ship',description:'Power Fx, Dataverse APIs, PCF, connectors, CLI, testing, and troubleshooting.',query:'api pcf connector deployment troubleshooting'},
+  {role:'Architect',title:'Design for trust and operations',description:'Architecture, integration, security, environment strategy, ALM, and governance.',query:'architecture security environment alm governance'},
+  {role:'Maker',title:'Create reliable business solutions',description:'Canvas and model-driven apps, flows, approvals, formulas, and data.',query:'canvas model-driven flows approvals formulas'},
+  {role:'Administrator',title:'Operate and govern the platform',description:'Environments, DLP, tenant administration, adoption, and the CoE toolkit.',query:'admin environments dlp governance coe'},
+];
+
 export function findRelevantResources(question: string, limit = 5) {
   const stopWords = new Set(['the','and','for','with','how','should','before','into','from','that','this','what','when','where','which','would','could','build','make']);
   const aliases: Record<string,string[]> = {
