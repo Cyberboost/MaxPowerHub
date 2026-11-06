@@ -23,6 +23,9 @@ test('MCP initializes, discovers nine tools, and invokes search', async () => {
       'search_power_platform_resources',
       'troubleshoot_power_platform'
     ]);
+    assert.ok(listed.tools.every(tool=>tool.annotations?.readOnlyHint===true));
+    assert.ok(listed.tools.every(tool=>tool.annotations?.destructiveHint===false));
+    assert.ok(listed.tools.every(tool=>tool.annotations?.openWorldHint===false));
     const result=await client.callTool({name:'search_power_platform_resources',arguments:{query:'Power Fx',limit:3}});
     assert.equal(result.isError,undefined);
     assert.ok(Array.isArray(result.content));
