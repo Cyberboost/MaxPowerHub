@@ -1,10 +1,10 @@
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 import {z} from 'zod';
-import {getResource,recommendImplementationPattern,searchPowerPlatformResources,troubleshootPowerPlatform} from './tools.js';
+import {createPowerPlatformProjectBrief,generateSolutionBlueprint,getResource,recommendImplementationPattern,reviewPowerPlatformExpression,searchPowerPlatformResources,troubleshootPowerPlatform} from './tools.js';
 
 export function createPowerHubServer(){
-const server=new McpServer({name:'maxpowerhub-by-cyberboost',version:'0.1.0'});
+const server=new McpServer({name:'maxpowerhub-by-cyberboost',version:'0.2.0'});
 const respond=(data:unknown)=>({content:[{type:'text' as const,text:JSON.stringify(data)}]});
 
 server.tool('search_power_platform_resources','Search curated Power Platform references with source links',{
@@ -24,6 +24,20 @@ server.tool('recommend_implementation_pattern','Suggest a Power Platform impleme
 server.tool('troubleshoot_power_platform','Return safe diagnostic steps and curated troubleshooting references',{
   problem:z.string().min(1).max(1500),product:z.string().max(120).optional()
 },async input=>respond(troubleshootPowerPlatform(input)));
+
+server.tool('generate_solution_blueprint','Create a draft Power Platform architecture, security, environment, delivery, and risk blueprint with sources',{
+  objective:z.string().min(1).max(1000),users:z.string().min(1).max(500),data:z.string().min(1).max(700),process:z.string().min(1).max(1000),
+  integrations:z.string().max(700).optional(),security:z.string().max(700).optional(),scale:z.string().max(500).optional(),constraints:z.string().max(700).optional()
+},async input=>respond(generateSolutionBlueprint(input)));
+
+server.tool('review_power_platform_expression','Perform a safe static review of a Power Fx or Power Automate expression and return test guidance',{
+  language:z.enum(['Power Fx','Power Automate']),expression:z.string().min(1).max(8000),intent:z.string().max(700).optional()
+},async input=>respond(reviewPowerPlatformExpression(input)));
+
+server.tool('create_power_platform_project_brief','Turn discovery notes into a structured Power Platform project brief, backlog, questions, and governance gates',{
+  name:z.string().min(1).max(160),objective:z.string().min(1).max(1000),users:z.string().min(1).max(700),scope:z.string().min(1).max(1200),
+  data:z.string().max(700).optional(),integrations:z.string().max(700).optional(),success:z.string().max(700).optional(),constraints:z.string().max(700).optional()
+},async input=>respond(createPowerPlatformProjectBrief(input)));
 
 return server;
 }
