@@ -1,7 +1,7 @@
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 import {z} from 'zod';
-import {getResource,recommendImplementationPattern,searchPowerPlatformResources,troubleshootPowerPlatform} from './tools.ts';
+import {getResource,recommendImplementationPattern,searchPowerPlatformResources,troubleshootPowerPlatform} from './tools.js';
 
 export function createPowerHubServer(){
 const server=new McpServer({name:'maxpowerhub-by-cyberboost',version:'0.1.0'});
