@@ -1,0 +1,33 @@
+{
+  "name": "maxpowerhub-ai",
+  "version": "0.4.2",
+  "description": "Source-aware Microsoft Power Platform architecture, governance, engineering, delivery, and troubleshooting guidance.",
+  "author": {
+    "name": "CyberBoost"
+  },
+  "keywords": [
+    "Microsoft Power Platform",
+    "Power Apps",
+    "Power Automate",
+    "Power Fx",
+    "Center of Excellence",
+    "governance"
+  ],
+  "mcpServers": "./mcp.json",
+  "interface": {
+    "displayName": "MaxPowerHub AI",
+    "shortDescription": "Power Platform architect",
+    "longDescription": "A source-aware Microsoft Power Platform architect and engineering copilot for enterprise solution blueprints, Center of Excellence governance, Power Fx and Power Automate expressions, project planning, implementation patterns, and safe troubleshooting. Guidance is read-only and does not inspect or modify a Microsoft tenant.",
+    "developerName": "CyberBoost",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Help me design a governed Power Platform solution with sources, assumptions, risks, and validation steps.",
+    "websiteURL": "https://maxpowerhub.netlify.app/",
+    "supportURL": "https://maxpowerhub.netlify.app/support/",
+    "privacyPolicyURL": "https://maxpowerhub.netlify.app/privacy/",
+    "termsOfServiceURL": "https://maxpowerhub.netlify.app/terms/",
+    "logo": "./assets/maxpowerhub-icon.png",
+    "composerIcon": "./assets/maxpowerhub-icon.png",
+    "brandColor": "#0B1238"
+  }
+}

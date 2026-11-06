@@ -106,6 +106,6 @@ export default function Home() {
     </section>
 
     <section className="section consulting"><div><div className="kicker"><span></span>From idea to governed solution</div><h2>Need more than a link?</h2><p>CyberBoost helps teams plan, secure, automate, and improve real business workflows with practical Power Platform consulting.</p></div><a className="button primary" href="https://www.mycyberboost.tech" target="_blank" rel="noreferrer">Talk with CyberBoost <ArrowRight size={17}/></a></section>
-    <footer><a className="brand" href="#top"><span className="brand-mark"><Sparkles size={17}/></span><span>MaxPower<b>Hub</b><small>by CyberBoost</small></span></a><p>Independent community resource. Not affiliated with or endorsed by Microsoft. Always validate guidance against current product documentation.</p><div className="footer-links"><a href="/updates/">Updates</a><a href="/about/">About</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/submit/">Submit a resource</a></div></footer>
+    <footer><a className="brand" href="#top"><span className="brand-mark"><Sparkles size={17}/></span><span>MaxPower<b>Hub</b><small>by CyberBoost</small></span></a><p>Independent community resource. Not affiliated with or endorsed by Microsoft. Always validate guidance against current product documentation.</p><div className="footer-links"><a href="/updates/">Updates</a><a href="/about/">About</a><a href="/support/">Support</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/submit/">Submit a resource</a></div></footer>
   </main>;
 }

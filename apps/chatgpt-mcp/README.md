@@ -1,6 +1,6 @@
-# MaxPowerHub MCP — local prototype
+# MaxPowerHub MCP
 
-Read-only MCP tools backed by the existing `lib/resources.ts` catalog. This package currently uses **stdio** for local integration tests and is **not yet a ChatGPT-connectable remote HTTPS server**.
+Read-only, source-aware Microsoft Power Platform tools for MaxPowerHub AI. The service supports local stdio testing and a production Streamable HTTP endpoint hosted on Vercel.
 
 From repository root:
 
@@ -11,6 +11,6 @@ npm test
 npm run dev
 ```
 
-The four tools are `search_power_platform_resources`, `get_resource`, `recommend_implementation_pattern`, and `troubleshoot_power_platform`.
+The service exposes nine tools covering resource discovery, implementation patterns, troubleshooting, enterprise solution blueprints, Power Fx and Power Automate expression design and review, project briefs, and Center of Excellence assessments.
 
-Next: add a secure Streamable HTTP transport and staging deployment, verify ChatGPT Apps SDK compatibility, add end-to-end tests, and conduct a security review. Do not expose stdio over the public internet or deploy to production yet.
+Production requests are protected by Vercel Authentication and the configured automation-bypass credential. Never commit or print that credential. The endpoint is stateless, read-only, request-size limited, and does not connect to or modify a customer's Power Platform tenant.

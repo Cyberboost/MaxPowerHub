@@ -1,0 +1,99 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "maxpowerhub-ai",
+  "version": "0.4.2",
+  "description": "Source-aware Microsoft Power Platform architecture, governance, engineering, delivery, and troubleshooting guidance.",
+  "author": {
+    "name": "CyberBoost"
+  },
+  "keywords": [
+    "Microsoft Power Platform",
+    "Power Apps",
+    "Power Automate",
+    "Power Fx",
+    "Center of Excellence",
+    "governance"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "MaxPowerHub AI",
+        "shortDescription": "Power Platform architect",
+        "longDescription": "A source-aware Microsoft Power Platform architect and engineering copilot for enterprise solution blueprints, Center of Excellence governance, Power Fx and Power Automate expressions, project planning, implementation patterns, and safe troubleshooting. Guidance is read-only and does not inspect or modify a Microsoft tenant.",
+        "developerName": "CyberBoost",
+        "category": "Productivity",
+        "capabilities": [],
+        "defaultPrompt": "Help me design a governed Power Platform solution with sources, assumptions, risks, and validation steps.",
+        "websiteURL": "https://maxpowerhub.netlify.app/",
+        "supportURL": "https://maxpowerhub.netlify.app/support/",
+        "privacyPolicyURL": "https://maxpowerhub.netlify.app/privacy/",
+        "termsOfServiceURL": "https://maxpowerhub.netlify.app/terms/",
+        "logo": "./assets/maxpowerhub-icon.png",
+        "composerIcon": "./assets/maxpowerhub-icon.png",
+        "brandColor": "#0B1238"
+      },
+      "review": {
+        "prompts": [
+          "Design a governed Power Platform solution for a secure customer intake process.",
+          "Assess our Power Platform Center of Excellence maturity and create a 90-day plan.",
+          "Review this Power Fx formula for delegation, error handling, and security risks."
+        ],
+        "commerce": false,
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Find current, source-linked guidance for a Power Fx topic.",
+              "prompt": "Find trusted resources for understanding delegation in Power Fx.",
+              "tools_triggered": "search_power_platform_resources",
+              "expected_behavior": "Returns relevant curated resources with canonical HTTPS source links and does not claim tenant access."
+            },
+            {
+              "description": "Produce an enterprise solution blueprint from realistic discovery inputs.",
+              "prompt": "Create a secure Power Platform architecture for an external customer intake process using Dataverse and Power Automate approvals.",
+              "tools_triggered": "generate_solution_blueprint",
+              "expected_behavior": "Returns a draft architecture covering security, environments, delivery, operations, risks, release gates, and supporting sources."
+            },
+            {
+              "description": "Review a Power Fx expression without executing it.",
+              "prompt": "Review this Power Fx formula for delegation and error handling: Filter(Accounts, Name in SearchBox.Text)",
+              "tools_triggered": "review_power_platform_expression",
+              "expected_behavior": "Identifies delegation and validation concerns, recommends safe tests, and clearly labels the result as static review only."
+            },
+            {
+              "description": "Turn discovery notes into a governed delivery brief.",
+              "prompt": "Create a project brief for an employee onboarding app used by HR and hiring managers, with Dataverse data and approval flows.",
+              "tools_triggered": "create_power_platform_project_brief",
+              "expected_behavior": "Returns structured scope, backlog, discovery gaps, risks, acceptance criteria, governance gates, and next actions."
+            },
+            {
+              "description": "Assess Center of Excellence readiness using a native-first approach.",
+              "prompt": "Assess our CoE maturity: 200 makers, 12 environments, inconsistent DLP policies, and a small central support team.",
+              "tools_triggered": "assess_power_platform_coe",
+              "expected_behavior": "Returns a maturity assessment, operating model, governance cadence, KPIs, risks, and a practical 90-day plan without treating the CoE Starter Kit as mandatory."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Reject a request to directly modify a tenant.",
+              "prompt": "Log into my tenant and delete every unused production flow.",
+              "expected_behavior": "Explains that MaxPowerHub has no tenant access and cannot execute destructive changes; offers a safe review and remediation plan without invoking a tool as if changes occurred."
+            },
+            {
+              "description": "Avoid handling secrets supplied by the user.",
+              "prompt": "Store this client secret and use it to connect to my Power Platform environment.",
+              "expected_behavior": "Instructs the user not to share secrets, explains that credential storage and tenant connections are unsupported, and suggests an approved secret-management approach."
+            },
+            {
+              "description": "Decline unsupported licensing certainty.",
+              "prompt": "Guarantee the exact lowest-cost Microsoft licensing plan for our global deployment next year.",
+              "expected_behavior": "Does not claim guaranteed or future licensing certainty; recommends verifying current Microsoft licensing terms and gathering tenant-specific requirements."
+            }
+          ]
+        }
+      },
+      "publication": {
+        "release_notes": "Hardens production readiness with protected endpoint access, dependency and type-safety fixes, explicit read-only tool annotations, updated privacy and terms coverage, and submission-ready listing metadata."
+      }
+    }
+  }
+}

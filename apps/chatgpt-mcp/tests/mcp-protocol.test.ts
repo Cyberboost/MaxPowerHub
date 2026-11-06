@@ -25,6 +25,7 @@ test('MCP initializes, discovers nine tools, and invokes search', async () => {
     ]);
     const result=await client.callTool({name:'search_power_platform_resources',arguments:{query:'Power Fx',limit:3}});
     assert.equal(result.isError,undefined);
+    assert.ok(Array.isArray(result.content));
     const first=result.content[0];
     assert.equal(first.type,'text');
     if(first.type!=='text') throw new Error('Unexpected response type');
