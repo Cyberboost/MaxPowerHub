@@ -2,6 +2,8 @@
 
 Initial standalone public-beta application for a Microsoft Power Platform resource library and citation-first assistant.
 
+Live library-only preview: [maxpowerhub.netlify.app](https://maxpowerhub.netlify.app)
+
 ## What is included
 
 - Responsive, accessible product homepage
@@ -38,6 +40,6 @@ Do not commit API keys. Configure secrets only in the approved hosting providerâ
 
 ## Status
 
-The public preview is intentionally library-only. AI answers remain disabled until the launch gates above are complete.
+The public preview is intentionally library-only and was published from a verified static export. AI answers remain disabled until the launch gates above are complete.
 
 Created by [CyberBoost](https://www.mycyberboost.tech). Independent resource; not affiliated with or endorsed by Microsoft.
