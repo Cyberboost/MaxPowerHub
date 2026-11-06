@@ -1,4 +1,4 @@
-import {findRelevantResources, resources, searchResources} from '../../../lib/resources.ts';
+import {findRelevantResources, resources, searchResources} from '../../../lib/resources.js';
 
 const filters = (f: {product?: string;role?: string;task?: string;level?: string}) => ({
   product: f.product || 'All', role: f.role || 'All roles',
