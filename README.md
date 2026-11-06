@@ -1,23 +1,44 @@
 # PowerHub AI by CyberBoost
 
-A standalone, public Microsoft Power Platform knowledge hub with searchable curated resources and an AI-assisted Q&A endpoint.
+Initial standalone public-beta application for a Microsoft Power Platform resource library and citation-first assistant.
+
+## What is included
+
+- Responsive, accessible product homepage
+- Searchable and filterable directory of curated Microsoft and community sources
+- Server-side AI assistant route with structured citations
+- Library-only fallback when no AI key is configured
+- Input length controls and an illustrative in-memory hourly limit
+- CyberBoost attribution and consulting call to action
 
 ## Run locally
 
-1. Install Node.js 20+.
+1. Install Node.js 20 or newer.
 2. Run `npm install`.
-3. Copy `.env.example` to `.env.local`.
-4. Optionally set `OPENAI_API_KEY` in `.env.local` (never commit secrets).
-5. Run `npm run dev` and open http://localhost:3000.
+3. Optionally copy `.env.example` to `.env.local` and add an AI key for local testing only.
+4. Run `npm run dev` and open `http://localhost:3000`.
 
-## Deploy
+Validate a release candidate with:
 
-Connect this repository to Netlify using its Next.js support. Configure `OPENAI_API_KEY` in the hosting provider's secret environment settings, not in source control.
+```text
+npm run typecheck
+npm run build
+npm audit
+```
 
-## Current limitations
+## Public-launch gates
 
-This is an initial beta starter, not production-ready. Resource search is a curated static directory; the AI route uses directory metadata, not full-document retrieval. The in-memory IP limit is only illustrative and is not reliable across serverless instances. Before public AI access, add persistent rate limiting, abuse protection, budget caps, monitoring, and source-grounded retrieval. Review generated code and validate security, permissions, licensing, and product versions before use.
+- Complete a naming, domain, and trademark review. “PowerHub” is already used by multiple active software and AI businesses.
+- Replace the in-memory limiter with a persistent, distributed limiter before enabling public AI requests.
+- Configure provider spending caps, monitoring, abuse protection, and incident handling.
+- Verify every curated URL and establish a review cadence for product changes and stale links.
+- Add privacy/terms language appropriate to the final data flow and analytics choices.
+- Remove `robots: { index: false }` only after the name and launch are approved.
 
-## Attribution
+Do not commit API keys. Configure secrets only in the approved hosting provider’s secret settings.
+
+## Status
+
+The application builds locally. It has not been deployed, and the AI service should remain disabled for public visitors until the launch gates above are complete.
 
 Created by [CyberBoost](https://www.mycyberboost.tech). Independent resource; not affiliated with or endorsed by Microsoft.
