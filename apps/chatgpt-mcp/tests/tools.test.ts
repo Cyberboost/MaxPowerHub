@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import {strict as assert} from 'node:assert';
-import {assessCenterOfExcellence,createPowerPlatformProjectBrief,generateSolutionBlueprint,getResource,recommendImplementationPattern,reviewPowerPlatformExpression,searchPowerPlatformResources,troubleshootPowerPlatform} from '../src/tools.ts';
+import {assessCenterOfExcellence,createPowerPlatformProjectBrief,designPowerPlatformExpression,generateSolutionBlueprint,getResource,recommendImplementationPattern,reviewPowerPlatformExpression,searchPowerPlatformResources,troubleshootPowerPlatform} from '../src/tools.ts';
 
 test('search returns canonical source links',()=>{
  const result=searchPowerPlatformResources({query:'power fx',limit:3});
@@ -37,6 +37,23 @@ test('expression review warns about delegation patterns',()=>{
  assert.equal(result.status,'static-review');
  assert.ok(result.findings.some(f=>/delegation/i.test(f.message)));
  assert.match(result.note,/not executed/i);
+});
+test('expression review flags unhandled data writes and hardcoded sensitive values',()=>{
+ const result=reviewPowerPlatformExpression({language:'Power Fx',expression:'Patch(Accounts, Defaults(Accounts), { Name: txtName.Text, apiKey: "real-looking-secret" })',intent:'Create an account'});
+ assert.ok(result.findings.some(f=>/not wrapped/i.test(f.message)));
+ assert.ok(result.findings.some(f=>/hardcoded sensitive value/i.test(f.message)));
+});
+test('expression designer returns a documented Power Fx pattern and official sources',()=>{
+ const result=designPowerPlatformExpression({language:'Power Fx',scenario:'delegated search',requirements:'Search Dataverse accounts by name',dataSource:'Dataverse',fieldNames:'Account Name'});
+ assert.equal(result.status,'draft-expression-pattern');
+ assert.match(result.draft,/StartsWith/);
+ assert.match(result.note,/not executed, compiled, or validated/i);
+ assert.ok(result.sources.every(source=>source.url.startsWith('https://learn.microsoft.com/')));
+});
+test('expression designer returns null-safe Power Automate pattern',()=>{
+ const result=designPowerPlatformExpression({language:'Power Automate',scenario:'optional field',requirements:'Use a default when the trigger omits the field'});
+ assert.match(result.draft,/coalesce/);
+ assert.match(result.draft,/\?\['OptionalField'\]/);
 });
 test('project brief identifies missing discovery inputs',()=>{
  const result=createPowerPlatformProjectBrief({name:'Intake modernization',objective:'Reduce manual triage',users:'Operations team',scope:'Replace email intake with a governed application'});

@@ -104,22 +104,90 @@ export function reviewPowerPlatformExpression(input:{language:'Power Fx'|'Power 
   if(input.language==='Power Fx') {
     if(/\bfor(all)?\s*\(/i.test(expression)&&/patch\s*\(/i.test(expression)) findings.push({severity:'warning',message:'ForAll with Patch can create many network calls. Validate performance and whether a set-based pattern is available.'});
     if(/\bfilter\s*\(/i.test(expression)&&(/\bin\b|search\s*\(/i.test(expression))) findings.push({severity:'warning',message:'Confirm delegation support for the data source and operators; test with data above the delegation limit.'});
+    if(/\b(clearcollect|collect)\s*\(/i.test(expression)&&/\b(filter|search|sortbycolumns)\s*\(/i.test(expression)) findings.push({severity:'warning',message:'Collections are local and can hide delegation limitations. Confirm the source query delegates before materializing data.'});
+    if(/\b(firstn|lastn|last|distinct|groupby|ungroup|concat)\s*\(/i.test(expression)) findings.push({severity:'warning',message:'The formula uses a commonly nondelegable function. Validate connector-specific delegation and correctness above the app row limit.'});
     if(/iferror\s*\(/i.test(expression)===false) findings.push({severity:'info',message:'Consider explicit error handling with IfError for operations that can fail.'});
+    if(/\b(patch|collect|remove|removeif|update|updateif|submitform)\s*\(/i.test(expression)&&!/\biferror\s*\(/i.test(expression)) findings.push({severity:'warning',message:'A data-changing operation is not wrapped in explicit formula-level error handling.'});
+    if(/\bconcurrent\s*\(/i.test(expression)) findings.push({severity:'info',message:'Concurrent arguments must be independent. Confirm no argument reads a value written by another argument and verify error behavior.'});
     if(/;\s*;/.test(expression)) findings.push({severity:'warning',message:'Consecutive statement separators may indicate an empty or malformed statement.'});
   } else {
     if(/items\s*\(/i.test(expression)&&!/\?\[/.test(expression)) findings.push({severity:'info',message:'Consider null-safe property access when loop items may omit fields.'});
     if(/outputs\s*\(/i.test(expression)&&!/\?\[/.test(expression)) findings.push({severity:'info',message:'Confirm the referenced action and property always exist, or add null-safe handling.'});
+    if(/trigger(body|outputs)\s*\(/i.test(expression)&&!/\?\[/.test(expression)) findings.push({severity:'info',message:'Use null-safe property access for optional trigger fields.'});
+    if(/\?\[/.test(expression)&&!/\bcoalesce\s*\(/i.test(expression)) findings.push({severity:'info',message:'Null-safe access prevents a missing-property failure, but downstream actions may still need a default value with coalesce.'});
     if(/concat\s*\(/i.test(expression)&&/password|secret|token|key/i.test(input.intent||'')) findings.push({severity:'warning',message:'Do not compose or expose secrets in flow expressions, inputs, outputs, or run history.'});
   }
+  if(/(password|secret|token|api[_ -]?key)\s*[:=]\s*['"][^'"]+['"]/i.test(expression)) findings.push({severity:'warning',message:'The expression appears to contain a hardcoded sensitive value. Remove it and rotate the credential if it is real.'});
+  if(/https?:\/\/[\w.-]+/i.test(expression)) findings.push({severity:'info',message:'A hardcoded URL was detected. Consider an environment variable or connection configuration for environment portability.'});
   if(!expression) findings.push({severity:'warning',message:'No expression was provided.'});
   if(expression.length>4000) findings.push({severity:'warning',message:'The expression is unusually long. Break it into named steps or variables for maintainability.'});
   if(!findings.length) findings.push({severity:'info',message:'No common static issues were detected. Validate syntax and behavior in a development environment with representative test cases.'});
   return {
     status:'static-review',language:input.language,intent:input.intent||null,findings,
-    testChecklist:['Test blank, null, empty collection, and unexpected-type inputs.','Test permission failures and connector errors.','Confirm locale-sensitive dates and numbers.','Validate delegation, performance, and service limits with realistic data volume.','Run in development before copying into production.'],
+    qualityDimensions:{correctness:'Validate expected and unexpected inputs, branch behavior, and output types.',reliability:'Handle connector, network, permission, conflict, and partial-failure conditions.',performance:'Validate delegation, data volume, call count, concurrency, throttling, and payload size.',security:'Remove secrets and unnecessary sensitive data from formulas, inputs, outputs, variables, and run history.',maintainability:'Use descriptive names, smaller named steps, comments where supported, and environment-portable configuration.'},
+    testChecklist:['Test blank, null, empty collection, and unexpected-type inputs.','Test permission failures, conflicts, throttling, timeouts, and connector errors.','Confirm locale-sensitive dates and numbers.','Validate delegation with the app data row limit temporarily set to 1 and with realistic production-scale data.','Test partial failure and repeat execution so retries do not create duplicate or inconsistent results.','Run in development before copying into production.'],
     sources:findRelevantResources(`${input.language} expressions errors delegation`,4).map(({id,title,url,source})=>({id,title,url,source})),
     note:'Static review only. The expression was not executed and tenant data was not accessed.'
   };
+}
+
+const expressionSources={
+  'Power Fx':[
+    {id:'ms-powerfx-errors',title:'Understand errors in Power Fx',url:'https://learn.microsoft.com/power-platform/power-fx/error-handling',source:'Microsoft Learn'},
+    {id:'ms-powerfx-delegation',title:'Understand delegation in a canvas app',url:'https://learn.microsoft.com/power-apps/maker/canvas-apps/delegation-overview',source:'Microsoft Learn'},
+    {id:'ms-powerfx-reference',title:'Power Fx formula reference',url:'https://learn.microsoft.com/power-platform/power-fx/formula-reference-overview',source:'Microsoft Learn'}
+  ],
+  'Power Automate':[
+    {id:'ms-flow-null',title:'Getting errors with null fields',url:'https://learn.microsoft.com/troubleshoot/power-platform/power-automate/flow-run-issues/getting-errors-null-fields',source:'Microsoft Learn'},
+    {id:'ms-wdl-reference',title:'Workflow Definition Language schema reference',url:'https://learn.microsoft.com/azure/logic-apps/workflow-definition-language-schema',source:'Microsoft Learn'}
+  ]
+};
+
+export function designPowerPlatformExpression(input:{language:'Power Fx'|'Power Automate';scenario:string;requirements:string;dataSource?:string;fieldNames?:string}) {
+  const scenario=input.scenario.toLowerCase();
+  let draft:string;
+  let pattern:string;
+  let assumptions:string[];
+  if(input.language==='Power Fx') {
+    if(/search|filter|delegat/.test(scenario)) {
+      pattern='Delegation-conscious search';
+      draft=`Filter(\n    DataSource,\n    IsBlank(txtSearch.Text) || StartsWith(SearchColumn, txtSearch.Text)\n)`;
+      assumptions=['Replace DataSource and SearchColumn with real identifiers.','Confirm StartsWith delegates for the selected connector and column type.','Add explicit security filters; UI filtering is not authorization.'];
+    } else if(/patch|save|submit|update/.test(scenario)) {
+      pattern='Validated save with formula-level error handling';
+      draft=`If(\n    IsBlank(txtRequired.Text),\n    Notify("Enter the required value.", NotificationType.Warning),\n    IfError(\n        Set(varSavedRecord, Patch(DataSource, Defaults(DataSource), { RequiredColumn: txtRequired.Text })),\n        Notify(FirstError.Message, NotificationType.Error),\n        Notify("Saved successfully.", NotificationType.Success)\n    )\n)`;
+      assumptions=['Replace controls, data source, and columns with real identifiers.','Do not display raw sensitive error details to unauthorized users.','Confirm create permissions and required columns.'];
+    } else if(/bulk|multiple|forall/.test(scenario)) {
+      pattern='Controlled bulk-operation starting point';
+      draft=`IfError(\n    ForAll(\n        colPending As item,\n        Patch(DataSource, LookUp(DataSource, Id = item.Id), { Status: item.Status })\n    ),\n    Notify($"Some updates failed: {FirstError.Message}", NotificationType.Error),\n    Notify("Updates completed.", NotificationType.Success)\n)`;
+      assumptions=['ForAll iterations may run independently and can generate many calls.','Validate delegation of LookUp and performance at production volume.','Prefer a server-side or batch operation when atomicity or high volume is required.'];
+    } else {
+      pattern='Input validation and explicit result';
+      draft=`With(\n    { valueToCheck: Trim(txtInput.Text) },\n    If(\n        IsBlank(valueToCheck),\n        Notify("Enter a value.", NotificationType.Warning),\n        valueToCheck\n    )\n)`;
+      assumptions=['Replace placeholder controls and expected output behavior.','Add type, range, format, and authorization validation required by the use case.'];
+    }
+  } else {
+    if(/null|optional|property|field/.test(scenario)) {
+      pattern='Null-safe field with explicit default';
+      draft=`coalesce(triggerBody()?['OptionalField'], 'Default value')`;
+      assumptions=['Replace OptionalField and the default with values appropriate to the data contract.','A default can hide upstream data-quality problems; log or branch when absence is significant.'];
+    } else if(/condition|compare|status/.test(scenario)) {
+      pattern='Null-safe normalized comparison';
+      draft=`equals(toLower(coalesce(triggerBody()?['Status'], '')), 'approved')`;
+      assumptions=['Replace Status and approved with real contract values.','Confirm case normalization and blank behavior match the business rule.'];
+    } else if(/array|filter|list/.test(scenario)) {
+      pattern='Array-safe input normalization';
+      draft=`coalesce(body('Get_items')?['value'], json('[]'))`;
+      assumptions=['Replace Get_items with the exact action name.','Use Filter array or an OData query as appropriate; prefer source-side filtering for volume.'];
+    } else {
+      pattern='Null-safe value extraction';
+      draft=`coalesce(outputs('Previous_action')?['body']?['Property'], '')`;
+      assumptions=['Replace action and property names exactly as shown in the flow definition.','Confirm an empty string is a valid fallback for the downstream action.'];
+    }
+  }
+  return {status:'draft-expression-pattern',language:input.language,scenario:input.scenario,requirements:input.requirements,dataSource:input.dataSource||'Not provided',fieldNames:input.fieldNames||'Not provided',pattern,draft,assumptions,
+    reviewChecklist:['Replace every placeholder with validated identifiers and types.','Check connector-specific delegation or expression support.','Add explicit error, null, permission, and duplicate-processing behavior.','Keep secrets and unnecessary personal data out of expressions and run history.','Test in development with boundary, failure, and production-scale cases.'],
+    sources:expressionSources[input.language],note:'Draft pattern only. It was not executed, compiled, or validated against a tenant, connector, schema, locale, or data source.'};
 }
 
 export function createPowerPlatformProjectBrief(input:{name:string;objective:string;users:string;scope:string;data?:string;integrations?:string;success?:string;constraints?:string}) {

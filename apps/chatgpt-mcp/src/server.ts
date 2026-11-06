@@ -1,10 +1,10 @@
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 import {z} from 'zod';
-import {assessCenterOfExcellence,createPowerPlatformProjectBrief,generateSolutionBlueprint,getResource,recommendImplementationPattern,reviewPowerPlatformExpression,searchPowerPlatformResources,troubleshootPowerPlatform} from './tools.js';
+import {assessCenterOfExcellence,createPowerPlatformProjectBrief,designPowerPlatformExpression,generateSolutionBlueprint,getResource,recommendImplementationPattern,reviewPowerPlatformExpression,searchPowerPlatformResources,troubleshootPowerPlatform} from './tools.js';
 
 export function createPowerHubServer(){
-const server=new McpServer({name:'maxpowerhub-by-cyberboost',version:'0.3.0'});
+const server=new McpServer({name:'maxpowerhub-by-cyberboost',version:'0.4.0'});
 const respond=(data:unknown)=>({content:[{type:'text' as const,text:JSON.stringify(data)}]});
 
 server.tool('search_power_platform_resources','Search curated Power Platform references with source links',{
@@ -34,6 +34,10 @@ server.tool('generate_solution_blueprint','Create a draft Power Platform archite
 server.tool('review_power_platform_expression','Perform a safe static review of a Power Fx or Power Automate expression and return test guidance',{
   language:z.enum(['Power Fx','Power Automate']),expression:z.string().min(1).max(8000),intent:z.string().max(700).optional()
 },async input=>respond(reviewPowerPlatformExpression(input)));
+
+server.tool('design_power_platform_expression','Create a documented draft Power Fx or Power Automate expression pattern with assumptions, safety checks, and official sources',{
+  language:z.enum(['Power Fx','Power Automate']),scenario:z.string().min(1).max(300),requirements:z.string().min(1).max(1500),dataSource:z.string().max(300).optional(),fieldNames:z.string().max(700).optional()
+},async input=>respond(designPowerPlatformExpression(input)));
 
 server.tool('create_power_platform_project_brief','Turn discovery notes into a structured Power Platform project brief, backlog, questions, and governance gates',{
   name:z.string().min(1).max(160),objective:z.string().min(1).max(1000),users:z.string().min(1).max(700),scope:z.string().min(1).max(1200),
