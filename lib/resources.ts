@@ -1,14 +1,56 @@
-export type Resource = { title: string; category: string; type: string; description: string; url: string; source: string; };
+export type Resource = {
+  id: string; title: string; product: string; type: string;
+  level: 'Start here' | 'Intermediate' | 'Advanced';
+  description: string; url: string; source: string; tags: string[];
+};
+
 export const resources: Resource[] = [
- {title:'PnP Power Platform Samples',category:'Power Apps',type:'Samples',description:'Community-built Power Apps, flows, and Power Pages solutions.',url:'https://github.com/pnp/powerplatform-samples',source:'Microsoft 365 & Power Platform Community'},
- {title:'Microsoft Power Apps Samples',category:'Power Apps',type:'Code',description:'Dataverse, model-driven apps, PCF and custom connector examples.',url:'https://github.com/microsoft/PowerApps-Samples',source:'Microsoft'},
- {title:'Power Fx Reference',category:'Power Apps',type:'Documentation',description:'Functions, expressions, formulas, and language reference.',url:'https://learn.microsoft.com/en-us/power-platform/power-fx/overview',source:'Microsoft Learn'},
- {title:'Power Automate Documentation',category:'Power Automate',type:'How-to',description:'Cloud flows, expressions, approvals and automation tutorials.',url:'https://learn.microsoft.com/en-us/power-automate/',source:'Microsoft Learn'},
- {title:'Dataverse Developer Guide',category:'Dataverse',type:'Documentation',description:'Dataverse APIs, plugins, security and development patterns.',url:'https://learn.microsoft.com/en-us/power-apps/developer/data-platform/',source:'Microsoft Learn'},
- {title:'Power Pages Documentation',category:'Power Pages',type:'How-to',description:'Build secure external-facing sites with Power Pages.',url:'https://learn.microsoft.com/en-us/power-pages/',source:'Microsoft Learn'},
- {title:'Power BI Documentation',category:'Power BI',type:'Documentation',description:'DAX, data modeling, Power Query and analytics guidance.',url:'https://learn.microsoft.com/en-us/power-bi/',source:'Microsoft Learn'},
- {title:'Copilot Studio Documentation',category:'Copilot Studio',type:'Documentation',description:'Create and manage conversational agents.',url:'https://learn.microsoft.com/en-us/microsoft-copilot-studio/',source:'Microsoft Learn'},
- {title:'PnP Script Samples',category:'Administration',type:'Scripts',description:'PowerShell and Microsoft 365 administration scripts.',url:'https://github.com/pnp/script-samples',source:'Microsoft 365 & Power Platform Community'},
- {title:'Power Platform CLI',category:'Administration',type:'Tooling',description:'Official command-line tooling for Power Platform development.',url:'https://learn.microsoft.com/en-us/power-platform/developer/cli/introduction',source:'Microsoft Learn'}
+  {id:'power-platform-overview',title:'Power Platform documentation',product:'Platform',type:'Documentation',level:'Start here',description:'The official starting point for Power Apps, Power Automate, Power BI, Power Pages, and Copilot Studio.',url:'https://learn.microsoft.com/en-us/power-platform/',source:'Microsoft Learn',tags:['overview','governance','adoption']},
+  {id:'power-apps-overview',title:'What is Power Apps?',product:'Power Apps',type:'Learning path',level:'Start here',description:'Understand canvas apps, model-driven apps, Dataverse, and the Power Apps development experience.',url:'https://learn.microsoft.com/en-us/power-apps/powerapps-overview',source:'Microsoft Learn',tags:['canvas','model-driven','basics']},
+  {id:'power-fx-reference',title:'Power Fx formula reference',product:'Power Apps',type:'Reference',level:'Intermediate',description:'Browse functions, operators, data types, and formula patterns for Power Apps and other Power Platform products.',url:'https://learn.microsoft.com/en-us/power-platform/power-fx/formula-reference-overview',source:'Microsoft Learn',tags:['formulas','functions','expressions']},
+  {id:'power-apps-samples',title:'Power Apps code samples',product:'Power Apps',type:'Code samples',level:'Advanced',description:'Official samples for Dataverse, model-driven apps, client scripting, custom connectors, and component development.',url:'https://github.com/microsoft/PowerApps-Samples',source:'Microsoft',tags:['github','sdk','pcf','dataverse']},
+  {id:'pcf-overview',title:'Power Apps component framework overview',product:'Power Apps',type:'Documentation',level:'Advanced',description:'Build reusable code components for canvas and model-driven apps with the Power Apps component framework.',url:'https://learn.microsoft.com/en-us/power-apps/developer/component-framework/overview',source:'Microsoft Learn',tags:['pcf','typescript','components']},
+  {id:'power-automate-overview',title:'Power Automate documentation',product:'Power Automate',type:'Documentation',level:'Start here',description:'Create cloud flows, desktop flows, approvals, and process automation with official product guidance.',url:'https://learn.microsoft.com/en-us/power-automate/',source:'Microsoft Learn',tags:['flows','approvals','automation']},
+  {id:'expressions-reference',title:'Workflow expression functions',product:'Power Automate',type:'Reference',level:'Intermediate',description:'Transform strings, arrays, dates, and objects in cloud flows with the workflow expression language.',url:'https://learn.microsoft.com/en-us/azure/logic-apps/workflow-definition-language-functions-reference',source:'Microsoft Learn',tags:['expressions','functions','logic apps']},
+  {id:'approvals',title:'Get started with approvals',product:'Power Automate',type:'How-to',level:'Start here',description:'Create and manage approval workflows, including approval actions and response handling.',url:'https://learn.microsoft.com/en-us/power-automate/get-started-approvals',source:'Microsoft Learn',tags:['approvals','workflow','cloud flow']},
+  {id:'dataverse-overview',title:'What is Microsoft Dataverse?',product:'Dataverse',type:'Documentation',level:'Start here',description:'Learn how Dataverse stores business data and supports tables, relationships, logic, and security.',url:'https://learn.microsoft.com/en-us/power-apps/maker/data-platform/data-platform-intro',source:'Microsoft Learn',tags:['tables','relationships','security']},
+  {id:'dataverse-dev',title:'Dataverse developer guide',product:'Dataverse',type:'Developer guide',level:'Advanced',description:'Develop with Dataverse APIs, plug-ins, webhooks, events, and extensibility patterns.',url:'https://learn.microsoft.com/en-us/power-apps/developer/data-platform/',source:'Microsoft Learn',tags:['api','plugins','webhooks','sdk']},
+  {id:'dataverse-security',title:'Dataverse security concepts',product:'Dataverse',type:'Documentation',level:'Intermediate',description:'Understand roles, business units, teams, column security, and record access.',url:'https://learn.microsoft.com/en-us/power-platform/admin/wp-security-cds',source:'Microsoft Learn',tags:['security','roles','permissions']},
+  {id:'power-pages',title:'Power Pages documentation',product:'Power Pages',type:'Documentation',level:'Start here',description:'Plan, build, configure, and administer external-facing business websites with Power Pages.',url:'https://learn.microsoft.com/en-us/power-pages/',source:'Microsoft Learn',tags:['websites','portals','external users']},
+  {id:'pages-security',title:'Power Pages security',product:'Power Pages',type:'Security guide',level:'Intermediate',description:'Review authentication, web roles, table permissions, and secure site configuration.',url:'https://learn.microsoft.com/en-us/power-pages/security/',source:'Microsoft Learn',tags:['authentication','table permissions','web roles']},
+  {id:'power-bi',title:'Power BI documentation',product:'Power BI',type:'Documentation',level:'Start here',description:'Find official guidance for reports, semantic models, Power Query, sharing, and administration.',url:'https://learn.microsoft.com/en-us/power-bi/',source:'Microsoft Learn',tags:['analytics','reports','semantic models']},
+  {id:'dax',title:'DAX overview',product:'Power BI',type:'Reference',level:'Intermediate',description:'Learn the fundamentals of Data Analysis Expressions for calculations in Power BI semantic models.',url:'https://learn.microsoft.com/en-us/dax/dax-overview',source:'Microsoft Learn',tags:['dax','measures','calculations']},
+  {id:'power-query',title:'Power Query documentation',product:'Power BI',type:'Documentation',level:'Intermediate',description:'Connect, combine, and transform data with Power Query and the M language.',url:'https://learn.microsoft.com/en-us/power-query/',source:'Microsoft Learn',tags:['etl','m language','data transformation']},
+  {id:'copilot-studio',title:'Microsoft Copilot Studio documentation',product:'Copilot Studio',type:'Documentation',level:'Start here',description:'Build, test, publish, and manage agents using Copilot Studio.',url:'https://learn.microsoft.com/en-us/microsoft-copilot-studio/',source:'Microsoft Learn',tags:['agents','copilot','generative ai']},
+  {id:'copilot-guidance',title:'Copilot Studio adoption guidance',product:'Copilot Studio',type:'Guidance',level:'Intermediate',description:'Plan adoption and governance for Copilot Studio solutions.',url:'https://learn.microsoft.com/en-us/power-platform/guidance/adoption/copilot-studio',source:'Microsoft Learn',tags:['architecture','adoption','governance']},
+  {id:'admin-center',title:'Power Platform admin documentation',product:'Administration',type:'Admin guide',level:'Intermediate',description:'Manage environments, capacity, analytics, security, and tenant settings.',url:'https://learn.microsoft.com/en-us/power-platform/admin/',source:'Microsoft Learn',tags:['admin center','environments','tenant']},
+  {id:'well-architected',title:'Power Platform Well-Architected',product:'Architecture',type:'Framework',level:'Advanced',description:'Evaluate workloads across reliability, security, operations, performance, and experience optimization.',url:'https://learn.microsoft.com/en-us/power-platform/well-architected/',source:'Microsoft Learn',tags:['architecture','reliability','security']},
+  {id:'coe-starter-kit',title:'Center of Excellence Starter Kit',product:'Governance',type:'Toolkit',level:'Advanced',description:'Components and tools designed to support adoption, administration, governance, and nurturing.',url:'https://learn.microsoft.com/en-us/power-platform/guidance/coe/starter-kit',source:'Microsoft Learn',tags:['coe','governance','adoption']},
+  {id:'alm',title:'Application lifecycle management',product:'Governance',type:'Guidance',level:'Advanced',description:'Plan solution-aware development, source control, testing, and deployment across environments.',url:'https://learn.microsoft.com/en-us/power-platform/alm/',source:'Microsoft Learn',tags:['alm','solutions','deployment','pipelines']},
+  {id:'pac-cli',title:'Power Platform CLI',product:'Developer tools',type:'Tooling',level:'Advanced',description:'Use the official CLI for environments, solutions, Dataverse, Power Pages, and code components.',url:'https://learn.microsoft.com/en-us/power-platform/developer/cli/introduction',source:'Microsoft Learn',tags:['pac','cli','automation']},
+  {id:'pnp-samples',title:'Power Platform community samples',product:'Community',type:'Code samples',level:'Intermediate',description:'Community-maintained Power Apps, Power Automate, Power Pages, and Copilot Studio samples.',url:'https://github.com/pnp/powerplatform-samples',source:'Microsoft 365 & Power Platform Community',tags:['github','samples','community']},
 ];
-export const categories = ['All','Power Apps','Power Automate','Dataverse','Power Pages','Power BI','Copilot Studio','Administration'];
+
+export const products = ['All', ...Array.from(new Set(resources.map((resource) => resource.product)))];
+
+export function findRelevantResources(question: string, limit = 5) {
+  const stopWords = new Set(['the','and','for','with','how','should','before','into','from','that','this','what','when','where','which','would','could','build','make']);
+  const aliases: Record<string,string[]> = {
+    secure:['security','permissions','roles'], securing:['security','permissions','roles'],
+    production:['alm','deployment','environment'], deploy:['deployment','alm','solutions'],
+    automate:['automation','flows'], agent:['agents','copilot'], formula:['formulas','power fx'],
+  };
+  const rawTerms = question.toLowerCase().split(/[^a-z0-9]+/).filter((term) => term.length > 2 && !stopWords.has(term));
+  const terms = Array.from(new Set(rawTerms.flatMap((term) => [term, ...(aliases[term] || [])])));
+  return resources.map((resource) => {
+    const title = resource.title.toLowerCase();
+    const product = resource.product.toLowerCase();
+    const tags = resource.tags.join(' ').toLowerCase();
+    const description = resource.description.toLowerCase();
+    const score = terms.reduce((total, term) => total +
+      (title.includes(term) ? 4 : 0) + (product.includes(term) ? 3 : 0) +
+      (tags.includes(term) ? 2 : 0) + (description.includes(term) ? 1 : 0), 0);
+    return {resource, score};
+  }).sort((a, b) => b.score - a.score || a.resource.title.localeCompare(b.resource.title))
+    .filter((item, index) => item.score > 0 || index < 3).slice(0, limit).map((item) => item.resource);
+}
