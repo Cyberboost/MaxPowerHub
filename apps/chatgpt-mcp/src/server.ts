@@ -4,7 +4,7 @@ import {z} from 'zod';
 import {assessCenterOfExcellence,createPowerPlatformProjectBrief,generateSolutionBlueprint,getResource,recommendImplementationPattern,reviewPowerPlatformExpression,searchPowerPlatformResources,troubleshootPowerPlatform} from './tools.js';
 
 export function createPowerHubServer(){
-const server=new McpServer({name:'maxpowerhub-by-cyberboost',version:'0.2.0'});
+const server=new McpServer({name:'maxpowerhub-by-cyberboost',version:'0.3.0'});
 const respond=(data:unknown)=>({content:[{type:'text' as const,text:JSON.stringify(data)}]});
 
 server.tool('search_power_platform_resources','Search curated Power Platform references with source links',{
@@ -27,7 +27,8 @@ server.tool('troubleshoot_power_platform','Return safe diagnostic steps and cura
 
 server.tool('generate_solution_blueprint','Create a draft Power Platform architecture, security, environment, delivery, and risk blueprint with sources',{
   objective:z.string().min(1).max(1000),users:z.string().min(1).max(500),data:z.string().min(1).max(700),process:z.string().min(1).max(1000),
-  integrations:z.string().max(700).optional(),security:z.string().max(700).optional(),scale:z.string().max(500).optional(),constraints:z.string().max(700).optional()
+  integrations:z.string().max(700).optional(),security:z.string().max(700).optional(),scale:z.string().max(500).optional(),constraints:z.string().max(700).optional(),
+  businessCriticality:z.enum(['Low','Moderate','High','Mission critical']).optional(),availability:z.string().max(300).optional(),recovery:z.string().max(300).optional(),compliance:z.string().max(700).optional()
 },async input=>respond(generateSolutionBlueprint(input)));
 
 server.tool('review_power_platform_expression','Perform a safe static review of a Power Fx or Power Automate expression and return test guidance',{

@@ -20,11 +20,16 @@ test('troubleshooting never claims to inspect a tenant',()=>{
  assert.match(result.note,/No access to customer tenants/);
 });
 test('solution blueprint includes delivery, security, risk, and citations',()=>{
- const result=generateSolutionBlueprint({objective:'Create a secure customer intake process',users:'External customers and internal case workers',data:'Dataverse business data',process:'Customers submit requests and staff review them',integrations:'Power Automate approvals',security:'External identities and least privilege'});
+ const result=generateSolutionBlueprint({objective:'Create a secure customer intake process',users:'External customers and internal case workers',data:'Dataverse business data',process:'Customers submit requests and staff review them',integrations:'Power Automate approvals',security:'External identities and least privilege',businessCriticality:'High',availability:'Business hours with monitored after-hours processing',recovery:'Restore service within four hours',compliance:'Personal data and records retention'});
  assert.equal(result.status,'draft-blueprint');
  assert.match(result.architecture.experience,/Power Pages/);
  assert.ok(result.security.length>=3);
  assert.ok(result.deliveryPlan.length>=4);
+ assert.deepEqual(Object.keys(result.wellArchitectedReview),['reliability','security','operationalExcellence','performanceEfficiency','experienceOptimization']);
+ assert.ok(result.releaseGates.length>=6);
+ assert.ok(result.riskRegister.length>=5);
+ assert.ok(result.responsibilityMatrix.length>=4);
+ assert.ok(result.rollbackPlan.some(item=>/data changes/i.test(item)));
  assert.ok(result.sources.length>0);
 });
 test('expression review warns about delegation patterns',()=>{
