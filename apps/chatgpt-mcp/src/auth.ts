@@ -45,6 +45,11 @@ export function bearerChallenge(scope:string){
   return `Bearer resource_metadata="${metadataUrl}", scope="${scope}"`;
 }
 
+export function accessTokenAudiences(audience:string){
+  const applicationId=audience.replace(/^api:\/\//,'');
+  return applicationId===audience?[audience]:[audience,applicationId];
+}
+
 export function toolBearerChallenge(scope:string){
   return `Bearer resource_metadata="${metadataUrl}", scope="${scope}", error="insufficient_scope", error_description="Sign in to MaxPowerHub AI to continue"`;
 }
@@ -55,7 +60,7 @@ export async function verifyAccessToken(header:string|undefined,env:NodeJS.Proce
   const token=header.slice(7).trim();
   if(!token)throw new Error('Missing bearer token');
   const jwks=createRemoteJWKSet(config.jwksUrl);
-  const {payload}=await jwtVerify(token,jwks,{audience:config.audience});
+  const {payload}=await jwtVerify(token,jwks,{audience:accessTokenAudiences(config.audience)});
   const tenantId=typeof payload.tid==='string'?payload.tid.toLowerCase():'';
   const expectedIssuer=`https://login.microsoftonline.com/${tenantId}/v2.0`;
   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(tenantId)||payload.iss!==expectedIssuer){

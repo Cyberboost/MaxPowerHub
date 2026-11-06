@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  accessTokenAudiences,
   bearerChallenge,
   getOAuthConfig,
   oauthEnabled,
@@ -33,6 +34,16 @@ test('OAuth configuration rejects missing required values',()=>{
   assert.throws(()=>getOAuthConfig({ENTRA_AUTHORITY:'common'}),/incomplete/);
   assert.throws(()=>getOAuthConfig({ENTRA_AUDIENCE:'api:\/\/maxpowerhub'}),/incomplete/);
   assert.throws(()=>getOAuthConfig({ENTRA_AUTHORITY:'not-a-tenant',ENTRA_AUDIENCE:'api:\/\/maxpowerhub'}),/incomplete/);
+});
+
+test('Entra v2 token validation accepts only both identifiers for the registered API',()=>{
+  assert.deepEqual(accessTokenAudiences('api://67fbdd50-800a-4bff-9001-081100f8485a'),[
+    'api://67fbdd50-800a-4bff-9001-081100f8485a',
+    '67fbdd50-800a-4bff-9001-081100f8485a'
+  ]);
+  assert.deepEqual(accessTokenAudiences('67fbdd50-800a-4bff-9001-081100f8485a'),[
+    '67fbdd50-800a-4bff-9001-081100f8485a'
+  ]);
 });
 
 test('protected resource metadata advertises Entra and the required scope',()=>{
