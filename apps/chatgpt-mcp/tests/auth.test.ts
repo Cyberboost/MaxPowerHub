@@ -26,6 +26,7 @@ test('Entra configuration uses the multi-tenant v2 endpoints',()=>{
   assert.equal(config.jwksUrl.href,'https://login.microsoftonline.com/common/discovery/v2.0/keys');
   assert.equal(config.audience,'api://maxpowerhub');
   assert.equal(config.scope,'mcp.access');
+  assert.equal(config.authorizationScope,'api://maxpowerhub/mcp.access');
 });
 
 test('OAuth configuration rejects missing required values',()=>{
@@ -38,7 +39,7 @@ test('protected resource metadata advertises Entra and the required scope',()=>{
   assert.deepEqual(protectedResourceMetadata(env),{
     resource:'https://maxpowerhub-mcp.vercel.app',
     authorization_servers:['https://login.microsoftonline.com/common/v2.0'],
-    scopes_supported:['mcp.access'],
+    scopes_supported:['api://maxpowerhub/mcp.access'],
     bearer_methods_supported:['header'],
     resource_documentation:'https://maxpowerhub.netlify.app/support/',
     resource_policy_uri:'https://maxpowerhub.netlify.app/privacy/',

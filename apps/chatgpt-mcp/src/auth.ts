@@ -3,7 +3,7 @@ import {createRemoteJWKSet,jwtVerify} from 'jose';
 const resource='https://maxpowerhub-mcp.vercel.app';
 const metadataUrl=`${resource}/.well-known/oauth-protected-resource`;
 
-export type OAuthConfig={authority:string;audience:string;scope:string;authorizationServer:string;jwksUrl:URL};
+export type OAuthConfig={authority:string;audience:string;scope:string;authorizationScope:string;authorizationServer:string;jwksUrl:URL};
 
 export function oauthEnabled(env:NodeJS.ProcessEnv=process.env){return env.OAUTH_ENABLED==='true';}
 
@@ -17,6 +17,7 @@ export function getOAuthConfig(env:NodeJS.ProcessEnv=process.env):OAuthConfig{
     authority,
     audience,
     scope,
+    authorizationScope:env.ENTRA_AUTHORIZATION_SCOPE?.trim()||`${audience.startsWith('api://')?audience:`api://${audience}`}/${scope}`,
     authorizationServer:`https://login.microsoftonline.com/${authority}/v2.0`,
     jwksUrl:new URL(`https://login.microsoftonline.com/${authority}/discovery/v2.0/keys`)
   };
@@ -27,7 +28,7 @@ export function protectedResourceMetadata(env:NodeJS.ProcessEnv=process.env){
   return {
     resource,
     authorization_servers:[config.authorizationServer],
-    scopes_supported:[config.scope],
+    scopes_supported:[config.authorizationScope],
     bearer_methods_supported:['header'],
     resource_documentation:'https://maxpowerhub.netlify.app/support/',
     resource_policy_uri:'https://maxpowerhub.netlify.app/privacy/',

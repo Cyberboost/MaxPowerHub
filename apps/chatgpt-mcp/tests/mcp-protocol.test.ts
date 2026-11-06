@@ -55,9 +55,13 @@ test('OAuth mode permits discovery and challenges unauthenticated tool calls', a
     await Promise.all([server.connect(serverTransport),client.connect(clientTransport)]);
     const listed=await client.listTools();
     assert.equal(listed.tools.length,9);
+    assert.ok(listed.tools.every(tool=>tool._meta?.securitySchemes?.[0]?.scopes?.includes('api://67fbdd50-800a-4bff-9001-081100f8485a/mcp.access')));
     const result=await client.callTool({name:'search_power_platform_resources',arguments:{query:'Power Fx'}});
     assert.equal(result.isError,true);
     assert.ok(Array.isArray(result._meta?.['mcp/www_authenticate']));
+    const challenge=result._meta?.['mcp/www_authenticate']?.[0];
+    assert.match(String(challenge),/error="insufficient_scope"/);
+    assert.match(String(challenge),/error_description="Sign in to MaxPowerHub AI to continue"/);
   } finally {
     await client.close();
     await server.close();
