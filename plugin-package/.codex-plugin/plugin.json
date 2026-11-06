@@ -13,7 +13,7 @@
     "Center of Excellence",
     "governance"
   ],
-  "mcpServers": "./mcp.json",
+  "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "MaxPowerHub AI",
     "shortDescription": "Power Platform architect",

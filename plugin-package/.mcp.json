@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "maxpowerhub-ai": {
+      "type": "streamable-http",
+      "url": "https://maxpowerhub-mcp.vercel.app/mcp",
+      "headers": {},
+      "extensions": {
+        "com.openai": {
+          "auth": {
+            "type": "api_key",
+            "headerScheme": "custom_header",
+            "headerName": "x-vercel-protection-bypass"
+          }
+        }
+      }
+    }
+  }
+}
