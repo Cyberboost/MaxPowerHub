@@ -13,8 +13,9 @@
               "clientId": "67fbdd50-800a-4bff-9001-081100f8485a",
               "tokenEndpointAuthMethod": "none"
             },
-            "authorizationUrl": "https://login.microsoftonline.com/9e1e0ee5-54f2-4e97-99b9-72bbe6eda2ea/oauth2/v2.0/authorize",
-            "tokenUrl": "https://login.microsoftonline.com/9e1e0ee5-54f2-4e97-99b9-72bbe6eda2ea/oauth2/v2.0/token",
+            "authorizationUrl": "https://maxpowerhub-mcp.vercel.app/oauth/authorize",
+            "tokenUrl": "https://maxpowerhub-mcp.vercel.app/oauth/token",
+            "authorizationServerBase": "https://maxpowerhub-mcp.vercel.app",
             "resource": "https://maxpowerhub-mcp.vercel.app",
             "baseScopes": [
               "api://67fbdd50-800a-4bff-9001-081100f8485a/mcp.access",
