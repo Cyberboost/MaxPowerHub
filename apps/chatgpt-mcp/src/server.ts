@@ -3,6 +3,7 @@ import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 import {z} from 'zod';
 import {getResource,recommendImplementationPattern,searchPowerPlatformResources,troubleshootPowerPlatform} from './tools.ts';
 
+export function createPowerHubServer(){
 const server=new McpServer({name:'maxpowerhub-by-cyberboost',version:'0.1.0'});
 const respond=(data:unknown)=>({content:[{type:'text' as const,text:JSON.stringify(data)}]});
 
@@ -24,4 +25,9 @@ server.tool('troubleshoot_power_platform','Return safe diagnostic steps and cura
   problem:z.string().min(1).max(1500),product:z.string().max(120).optional()
 },async input=>respond(troubleshootPowerPlatform(input)));
 
-await server.connect(new StdioServerTransport());
+return server;
+}
+
+if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+  await createPowerHubServer().connect(new StdioServerTransport());
+}
