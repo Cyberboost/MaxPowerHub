@@ -1,5 +1,5 @@
 import type {VercelRequest,VercelResponse} from '@vercel/node';
-import {bridgeCallback} from '../src/oauth-bridge.js';
+import {bridgeCallback,isAllowedOAuthClient} from '../src/oauth-bridge.js';
 import {entraAuthorizationServer,getOAuthConfig} from '../src/auth.js';
 
 export default async function handler(req:VercelRequest,res:VercelResponse){
@@ -9,7 +9,8 @@ export default async function handler(req:VercelRequest,res:VercelResponse){
     const incoming=new URLSearchParams(typeof req.body==='string'?req.body:req.body||{});
     const config=getOAuthConfig();
     const clientId=config.audience.replace(/^api:\/\//,'');
-    if(incoming.get('client_id')!==clientId)return res.status(401).json({error:'invalid_client'});
+    if(!isAllowedOAuthClient(incoming.get('client_id')||''))return res.status(401).json({error:'invalid_client'});
+    incoming.set('client_id',clientId);
     const grantType=incoming.get('grant_type');
     if(grantType==='authorization_code')incoming.set('redirect_uri',bridgeCallback);
     else if(grantType!=='refresh_token')return res.status(400).json({error:'unsupported_grant_type'});

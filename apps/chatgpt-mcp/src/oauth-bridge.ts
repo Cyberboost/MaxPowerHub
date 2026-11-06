@@ -38,6 +38,17 @@ export function isAllowedChatGptRedirect(value:string){
   }catch{return false;}
 }
 
+export function isAllowedOAuthClient(value:string,env:NodeJS.ProcessEnv=process.env){
+  const configured=getOAuthConfig(env).audience.replace(/^api:\/\//,'');
+  if(value===configured)return true;
+  try{
+    const url=new URL(value);
+    return url.origin==='https://chatgpt.com' && (
+      url.pathname==='/oauth/client.json' || /^\/oauth\/[A-Za-z0-9_-]+\/client\.json$/.test(url.pathname)
+    ) && !url.search && !url.hash;
+  }catch{return false;}
+}
+
 export function oauthAuthorizationMetadata(env:NodeJS.ProcessEnv=process.env){
   const config=getOAuthConfig(env);
   return {
@@ -45,6 +56,7 @@ export function oauthAuthorizationMetadata(env:NodeJS.ProcessEnv=process.env){
     authorization_endpoint:`${oauthResource}/oauth/authorize`,
     token_endpoint:`${oauthResource}/oauth/token`,
     token_endpoint_auth_methods_supported:['none'],
+    client_id_metadata_document_supported:true,
     response_types_supported:['code'],
     grant_types_supported:['authorization_code','refresh_token'],
     code_challenge_methods_supported:['S256'],
@@ -55,15 +67,16 @@ export function oauthAuthorizationMetadata(env:NodeJS.ProcessEnv=process.env){
 export function entraAuthorizeUrl(params:URLSearchParams,env:NodeJS.ProcessEnv=process.env){
   const config=getOAuthConfig(env);
   const clientId=config.audience.replace(/^api:\/\//,'');
-  if(params.get('client_id')!==clientId)throw new Error('Unknown OAuth client');
+  if(!isAllowedOAuthClient(params.get('client_id')||'',env))throw new Error('Unknown OAuth client');
   const redirectUri=params.get('redirect_uri')||'';
   const clientState=params.get('state')||'';
   if(!isAllowedChatGptRedirect(redirectUri)||!clientState)throw new Error('Invalid OAuth redirect');
   if(params.get('response_type')!=='code'||params.get('code_challenge_method')!=='S256'||!params.get('code_challenge'))throw new Error('PKCE S256 is required');
   const upstream=new URL(`${entraAuthorizationServer(env)}/authorize`);
-  for(const key of ['client_id','response_type','scope','code_challenge','code_challenge_method','prompt','login_hint']){
+  for(const key of ['response_type','scope','code_challenge','code_challenge_method','prompt','login_hint']){
     const value=params.get(key); if(value)upstream.searchParams.set(key,value);
   }
+  upstream.searchParams.set('client_id',clientId);
   upstream.searchParams.set('redirect_uri',bridgeCallback);
   upstream.searchParams.set('state',signBridgeState({redirectUri,clientState,expiresAt:Date.now()+10*60_000},env));
   return upstream;
