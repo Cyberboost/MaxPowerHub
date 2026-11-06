@@ -1,7 +1,7 @@
 'use client';
 import {useMemo, useState} from 'react';
 import {ArrowRight, BookOpen, Bot, Check, ExternalLink, Search, ShieldCheck, Sparkles} from 'lucide-react';
-import {products, resources} from '../lib/resources';
+import {findRelevantResources, products, resources} from '../lib/resources';
 
 type Citation = {id:string; title:string; url:string; source:string};
 type AssistantResult = {answer:string; citations:Citation[]; mode?:string};
@@ -24,11 +24,9 @@ export default function Home() {
     if (!question.trim()) return;
     setLoading(true); setResult(null); setError('');
     try {
-      const response = await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question})});
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'The assistant could not answer that question.');
-      setResult(data);
-    } catch (caught) { setError(caught instanceof Error ? caught.message : 'The assistant is unavailable.'); }
+      const citations = findRelevantResources(question).map(({id,title,url,source})=>({id,title,url,source}));
+      setResult({mode:'library-only',answer:'AI answers are intentionally off during the library-only preview. These curated sources are the best place to start, and each link opens the current publisher documentation for verification.',citations});
+    } catch (caught) { setError(caught instanceof Error ? caught.message : 'The source guide is unavailable.'); }
     finally { setLoading(false); }
   }
 

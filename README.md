@@ -6,8 +6,8 @@ Initial standalone public-beta application for a Microsoft Power Platform resour
 
 - Responsive, accessible product homepage
 - Searchable and filterable directory of curated Microsoft and community sources
-- Server-side AI assistant route with structured citations
-- Library-only fallback when no AI key is configured
+- Library-only assistant experience with structured source cards
+- Static export with no server credentials or AI usage costs
 - Input length controls and an illustrative in-memory hourly limit
 - CyberBoost attribution and consulting call to action
 
@@ -15,8 +15,7 @@ Initial standalone public-beta application for a Microsoft Power Platform resour
 
 1. Install Node.js 20 or newer.
 2. Run `npm install`.
-3. Optionally copy `.env.example` to `.env.local` and add an AI key for local testing only.
-4. Run `npm run dev` and open `http://localhost:3000`.
+3. Run `npm run dev` and open `http://localhost:3000`.
 
 Validate a release candidate with:
 
@@ -39,6 +38,6 @@ Do not commit API keys. Configure secrets only in the approved hosting providerâ
 
 ## Status
 
-The application builds locally. It has not been deployed, and the AI service should remain disabled for public visitors until the launch gates above are complete.
+The public preview is intentionally library-only. AI answers remain disabled until the launch gates above are complete.
 
 Created by [CyberBoost](https://www.mycyberboost.tech). Independent resource; not affiliated with or endorsed by Microsoft.
