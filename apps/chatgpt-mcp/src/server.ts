@@ -4,7 +4,7 @@ import {z} from 'zod';
 import {assessCenterOfExcellence,createPowerPlatformProjectBrief,designPowerPlatformExpression,generateSolutionBlueprint,getResource,recommendImplementationPattern,reviewPowerPlatformExpression,searchPowerPlatformResources,troubleshootPowerPlatform} from './tools.js';
 
 export function createPowerHubServer(){
-const server=new McpServer({name:'maxpowerhub-by-cyberboost',version:'0.4.2'});
+const server=new McpServer({name:'maxpowerhub-by-cyberboost',version:'0.4.3'});
 const respond=(data:unknown)=>({content:[{type:'text' as const,text:JSON.stringify(data)}]});
 const readOnlyAnnotations={readOnlyHint:true,destructiveHint:false,openWorldHint:false} as const;
 

@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "maxpowerhub-ai",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Source-aware Microsoft Power Platform architecture, governance, engineering, delivery, and troubleshooting guidance.",
   "author": {
     "name": "CyberBoost"
@@ -92,6 +92,7 @@
         }
       },
       "publication": {
+        "countries": ["US", "CA", "GB", "IE", "AU", "NZ"],
         "release_notes": "Hardens production readiness with protected endpoint access, dependency and type-safety fixes, explicit read-only tool annotations, updated privacy and terms coverage, and submission-ready listing metadata."
       }
     }
