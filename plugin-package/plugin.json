@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "maxpowerhub-ai",
-  "version": "0.4.9",
+  "version": "0.4.10",
   "description": "Source-aware Microsoft Power Platform architecture, governance, engineering, delivery, and troubleshooting guidance.",
   "author": {
     "name": "CyberBoost"
