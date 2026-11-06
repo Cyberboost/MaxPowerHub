@@ -5,13 +5,14 @@ import {assessCenterOfExcellence,createPowerPlatformProjectBrief,designPowerPlat
 import {getOAuthConfig,oauthEnabled,toolBearerChallenge} from './auth.js';
 
 export function createPowerHubServer(){
-const server=new McpServer({name:'maxpowerhub-by-cyberboost',version:'0.4.7'});
+const server=new McpServer({name:'maxpowerhub-by-cyberboost',version:'0.4.8'});
 const respond=(data:unknown)=>({content:[{type:'text' as const,text:JSON.stringify(data)}]});
 const readOnlyAnnotations={readOnlyHint:true,destructiveHint:false,openWorldHint:false} as const;
 const scope=()=>{try{return getOAuthConfig().authorizationScope;}catch{return 'api://67fbdd50-800a-4bff-9001-081100f8485a/mcp.access';}};
 const authMeta={securitySchemes:[{type:'oauth2',scopes:[scope()]}]} as const;
 const authError=()=>({
   content:[{type:'text' as const,text:'Authentication required: sign in to MaxPowerHub AI to use this tool.'}],
+  structuredContent:{},
   _meta:{'mcp/www_authenticate':[toolBearerChallenge(scope())]},
   isError:true
 });
