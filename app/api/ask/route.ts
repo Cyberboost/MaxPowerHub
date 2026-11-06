@@ -1,0 +1,12 @@
+import {NextResponse} from 'next/server';
+import OpenAI from 'openai';
+import {resources} from '../../../lib/resources';
+export const runtime='nodejs';
+const hits=new Map<string,{count:number;reset:number}>();
+export async function POST(request:Request){
+ const ip=request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()||'unknown';const now=Date.now();const item=hits.get(ip);const usage=(!item||item.reset<now)?{count:0,reset:now+3600000}:item;if(++usage.count>12)return NextResponse.json({error:'Free beta limit reached (12 questions per hour). Please try again later.'},{status:429});hits.set(ip,usage);
+ let question:unknown;try{({question}=await request.json())}catch{return NextResponse.json({error:'Invalid request.'},{status:400})}if(typeof question!=='string'||!question.trim()||question.length>2000)return NextResponse.json({error:'Question must be 1–2000 characters.'},{status:400});
+ if(!process.env.OPENAI_API_KEY)return NextResponse.json({answer:'The AI assistant is not configured yet. Explore the curated resource library above, or ask the site administrator to configure OPENAI_API_KEY.'});
+ const terms=question.toLowerCase().split(/\W+/).filter(t=>t.length>3);const ranked=resources.map(r=>({r,score:terms.filter(t=>(r.title+' '+r.description+' '+r.category).toLowerCase().includes(t)).length})).sort((a,b)=>b.score-a.score).slice(0,6).map(x=>x.r);
+ try{const client=new OpenAI({apiKey:process.env.OPENAI_API_KEY});const completion=await client.chat.completions.create({model:process.env.OPENAI_MODEL||'gpt-4.1-mini',max_tokens:850,messages:[{role:'system',content:'You are PowerHub AI by CyberBoost, a technical Microsoft Power Platform assistant. Be accurate and concise. Use the provided source URLs when relevant, and distinguish general knowledge from verified source content. The URLs and descriptions are a curated directory, NOT full documentation or retrieved pages. Do not claim to have inspected their contents. Do not invent API capabilities. Flag permissions, licensing, security, and destructive operations. Never request secrets.'},{role:'user',content:`Question: ${question}\n\nCurated resource directory (metadata only): ${JSON.stringify(ranked)}`} ]});return NextResponse.json({answer:completion.choices[0]?.message?.content||'No response generated.'})}catch{return NextResponse.json({error:'AI service is temporarily unavailable. Please try again.'},{status:503})}
+}
