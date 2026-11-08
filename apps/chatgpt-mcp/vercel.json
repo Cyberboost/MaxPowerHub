@@ -22,6 +22,10 @@
       "destination": "/api/oauth-authorization-server"
     },
     {
+      "source": "/.well-known/openai-apps-challenge",
+      "destination": "/api/openai-apps-challenge"
+    },
+    {
       "source": "/oauth/authorize",
       "destination": "/api/oauth-authorize"
     },
