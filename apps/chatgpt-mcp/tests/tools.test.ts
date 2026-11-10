@@ -7,6 +7,13 @@ test('search returns canonical source links',()=>{
  assert.ok(result.results.length>0);
  assert.ok(result.results.every(r=>r.url.startsWith('https://')));
 });
+test('delegation search returns the official Power Fx guidance',()=>{
+ const result=searchPowerPlatformResources({query:'delegation in Power Fx',product:'Power Apps',limit:5});
+ assert.ok(result.results.length>0);
+ assert.equal(result.results[0].id,'power-fx-delegation');
+ assert.equal(result.results[0].source,'Microsoft Learn');
+ assert.match(result.results[0].url,/delegation-overview$/);
+});
 test('unknown resource is handled safely',()=>assert.equal(getResource('does-not-exist').found,false));
 test('pattern recommendation has citations',()=>{
  const result=recommendImplementationPattern({experience:'External website',data:'Dataverse business data',logic:'Inside the app',audience:'Partners or customers'});
